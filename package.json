@@ -5,7 +5,13 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "migrate": "prisma migrate dev --name",
+    "migrate:reset": "prisma migrate reset",
+    "migrate:status": "prisma migrate status",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",
@@ -13,6 +19,7 @@
     "@prisma/extension-accelerate": "^2.0.2",
     "next": "15.5.5",
     "next-auth": "^4.24.11",
+    "nodemailer": "^6.10.1",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },

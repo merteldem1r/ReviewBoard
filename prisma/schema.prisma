@@ -8,20 +8,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  role          UserRole  @default(USER)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  username       String?
+  email          String    @unique
+  email_verified DateTime? @map("email_verified")
+  image          String?
+  role           UserRole  @default(USER)
+  created_at     DateTime  @default(now()) @map("created_at")
+  updated_at     DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  accounts  Account[]
-  sessions  Session[]
-  items     Item[]
-  auditLogs AuditLog[]
+  accounts   Account[]
+  sessions   Session[]
+  items      Item[]
+  audit_logs AuditLog[]
 
   @@map("users")
 }
@@ -34,31 +34,31 @@ enum UserRole {
 
 // NextAuth required tables
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  id                  String  @id @default(cuid())
+  user_id             String  @map("user_id")
+  type                String
+  provider            String
+  provider_account_id String  @map("provider_account_id")
+  refresh_token       String? @map("refresh_token") @db.Text
+  access_token        String? @map("access_token") @db.Text
+  expires_at          Int?    @map("expires_at")
+  token_type          String? @map("token_type")
+  scope               String?
+  id_token            String? @map("id_token") @db.Text
+  session_state       String? @map("session_state")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@unique([provider, provider_account_id])
   @@map("accounts")
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  session_token String   @unique @map("session_token")
+  user_id       String   @map("user_id")
+  expires       DateTime
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -77,11 +77,11 @@ model Tag {
   id          String   @id @default(cuid())
   name        String   @unique // "AI", "Fintech", "Healthcare", etc.
   description String?
-  riskScore   Int      @default(0) // Base risk score for this tag
+  risk_score  Int      @default(0) @map("risk_score") // Base risk score for this tag
   color       String   @default("#6B7280") // Hex color for UI
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  is_active   Boolean  @default(true) @map("is_active")
+  created_at  DateTime @default(now()) @map("created_at")
+  updated_at  DateTime @updatedAt @map("updated_at")
 
   @@map("tags")
 }
@@ -94,14 +94,14 @@ model Item {
   amount      Decimal    @db.Decimal(12, 2)
   tags        String[] // Array of tag names ["AI", "Fintech"]
   status      ItemStatus @default(NEW)
-  riskScore   Int? // 0-100, calculated based on amount + tags
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  risk_score  Int?       @map("risk_score") // 0-100, calculated based on amount + tags
+  created_at  DateTime   @default(now()) @map("created_at")
+  updated_at  DateTime   @updatedAt @map("updated_at")
 
   // Relations
-  createdById String
-  createdBy   User       @relation(fields: [createdById], references: [id])
-  auditLogs   AuditLog[]
+  created_by_id String     @map("created_by_id")
+  created_by    User       @relation(fields: [created_by_id], references: [id])
+  audit_logs    AuditLog[]
 
   @@map("items")
 }
@@ -118,12 +118,12 @@ model Rule {
   id          String   @id @default(cuid())
   name        String
   description String?
-  ruleType    RuleType // "AMOUNT_THRESHOLD", "TAG_MULTIPLIER", etc.
+  rule_type   RuleType @map("rule_type") // "AMOUNT_THRESHOLD", "TAG_MULTIPLIER", etc.
   condition   String // JSON string with rule logic
   score       Int // Points to add
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  is_active   Boolean  @default(true) @map("is_active")
+  created_at  DateTime @default(now()) @map("created_at")
+  updated_at  DateTime @updatedAt @map("updated_at")
 
   @@map("rules")
 }
@@ -136,17 +136,17 @@ enum RuleType {
 
 // Audit log for tracking changes
 model AuditLog {
-  id        String   @id @default(cuid())
-  action    String // "CREATED", "STATUS_CHANGED", "UPDATED", etc.
-  oldValue  String? // JSON string
-  newValue  String? // JSON string
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  action     String // "CREATED", "STATUS_CHANGED", "UPDATED", etc.
+  old_value  String?  @map("old_value") // JSON string
+  new_value  String?  @map("new_value") // JSON string
+  created_at DateTime @default(now()) @map("created_at")
 
   // Relations
-  itemId String
-  item   Item   @relation(fields: [itemId], references: [id])
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  item_id String @map("item_id")
+  item    Item   @relation(fields: [item_id], references: [id])
+  user_id String @map("user_id")
+  user    User   @relation(fields: [user_id], references: [id])
 
   @@map("audit_logs")
 }
