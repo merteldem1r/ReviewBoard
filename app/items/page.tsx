@@ -1,7 +1,7 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function ItemsPage() {
   const session = await getServerSession(authOptions);
@@ -49,7 +49,9 @@ export default async function ItemsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Risk Score</label>
+              <label className="block text-sm font-medium mb-2">
+                Risk Score
+              </label>
               <select className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2">
                 <option>All</option>
                 <option>Low (0-30)</option>
@@ -71,7 +73,6 @@ export default async function ItemsPage() {
 
         {/* Empty State */}
         <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-12 text-center">
-          <div className="text-4xl mb-4">📋</div>
           <h2 className="text-xl font-bold mb-2">No items yet</h2>
           <p className="text-gray-400 mb-6">
             Get started by creating your first item for review

@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     if (!token) {
       return NextResponse.redirect(
         new URL("/auth/signin?error=missing_token", req.url)
-      );
+      )
     }
 
     // Find verification token

@@ -1,7 +1,9 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
+import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -18,15 +20,18 @@ export default async function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
             <p className="text-gray-400">
-              Welcome back, {session.user?.name || session.user?.email}
+              Welcome back, @{session.user?.username || "username"}
             </p>
           </div>
-          <Link
-            href="/api/auth/signout"
-            className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all"
-          >
-            Sign Out
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/profile"
+              className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all cursor-pointer"
+            >
+              Profile
+            </Link>
+            <SignOut />
+          </div>
         </div>
 
         {/* Quick Stats */}

@@ -41,13 +41,12 @@ export async function POST(req: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user (email_verified is null initially)
     const user = await prisma.user.create({
       data: {
         username,
         email,
         password: hashedPassword,
-        email_verified: null, // Requires verification
+        email_verified: null,
       },
     });
 
@@ -55,19 +54,21 @@ export async function POST(req: Request) {
     const token = await prisma.verificationToken.create({
       data: {
         identifier: user.email,
-        token: `${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`,
+        token: `${Math.random().toString(36).substring(2)}${Date.now().toString(
+          36
+        )}`,
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
     });
 
     // Send verification email
     const verificationUrl = `${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token.token}`;
-    
+
     try {
       // Use nodemailer to send email
       const nodemailer = require("nodemailer");
       const transporter = nodemailer.createTransport(process.env.EMAIL_SERVER);
-      
+
       await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: user.email,
@@ -88,11 +89,13 @@ export async function POST(req: Request) {
         `,
       });
     } catch (emailError) {
+      console.log(emailError);
     }
 
     return NextResponse.json(
       {
-        message: "User created successfully. Please check your email to verify your account.",
+        message:
+          "User created successfully. Please check your email to verify your account.",
         user: {
           id: user.id,
           username: user.username,
