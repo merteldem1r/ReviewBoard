@@ -1,12 +1,15 @@
 import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
 
-  const { username, email, role, created_at } = session.user;
+  if (!session) {
+    return;
+  }
+
+  const { username, email, role, created_at } = session?.user;
 
   const formatDate = (date: string | Date) => {
     return new Intl.DateTimeFormat("en-US", {

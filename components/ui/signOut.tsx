@@ -1,5 +1,6 @@
 "use client";
 import { signOut } from "next-auth/react";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 const SignOut = () => {
