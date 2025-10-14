@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts  Account[]
+  sessions  Session[]
+  items     Item[]
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  REVIEWER
+}
+
+// NextAuth required tables
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+// Predefined tags system
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique // "AI", "Fintech", "Healthcare", etc.
+  description String?
+  riskScore   Int      @default(0) // Base risk score for this tag
+  color       String   @default("#6B7280") // Hex color for UI
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tags")
+}
+
+// Main business logic tables
+model Item {
+  id          String     @id @default(cuid())
+  title       String
+  description String     @db.Text
+  amount      Decimal    @db.Decimal(12, 2)
+  tags        String[] // Array of tag names ["AI", "Fintech"]
+  status      ItemStatus @default(NEW)
+  riskScore   Int? // 0-100, calculated based on amount + tags
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  createdById String
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  auditLogs   AuditLog[]
+
+  @@map("items")
+}
+
+enum ItemStatus {
+  NEW
+  IN_REVIEW
+  APPROVED
+  REJECTED
+}
+
+// Rules for risk scoring (amount-based rules)
+model Rule {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ruleType    RuleType // "AMOUNT_THRESHOLD", "TAG_MULTIPLIER", etc.
+  condition   String // JSON string with rule logic
+  score       Int // Points to add
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("rules")
+}
+
+enum RuleType {
+  AMOUNT_THRESHOLD // If amount > X, add Y points
+  TAG_MULTIPLIER // Multiply tag scores by factor
+  COMBINATION // Special rules for tag combinations
+}
+
+// Audit log for tracking changes
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String // "CREATED", "STATUS_CHANGED", "UPDATED", etc.
+  oldValue  String? // JSON string
+  newValue  String? // JSON string
+  createdAt DateTime @default(now())
+
+  // Relations
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
