@@ -19,7 +19,7 @@ export default async function ItemsPage() {
               href="/dashboard"
               className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all"
             >
-              Back to Dashboard
+              Dashboard
             </Link>
             <Link
               href="/items/new"

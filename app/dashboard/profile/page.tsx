@@ -116,7 +116,7 @@ export default async function Profile() {
                 href="/dashboard"
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium"
               >
-                Back to Dashboard
+                Dashboard
               </a>
               <SignOut />
             </div>

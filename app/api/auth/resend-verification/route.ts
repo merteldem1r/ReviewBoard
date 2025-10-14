@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
-      // Don't reveal if user exists or not
       return NextResponse.json(
         { message: "If an account exists, a verification email will be sent." },
         { status: 200 }
