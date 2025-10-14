@@ -10,8 +10,6 @@ export default async function DashboardPage() {
     redirect("/auth/signin");
   }
 
-  console.log("session: ", session);
-
   return (
     <main className="min-h-screen bg-[#0a0a0a] p-8">
       <div className="max-w-6xl mx-auto">

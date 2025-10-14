@@ -17,6 +17,7 @@
     "@auth/prisma-adapter": "^2.11.0",
     "@prisma/client": "^6.17.1",
     "@prisma/extension-accelerate": "^2.0.2",
+    "bcrypt": "^6.0.0",
     "next": "15.5.5",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.1",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-[#0a0a0a] px-4">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-[#0a0a0a] px-4"> 
       <div className="text-center max-w-2xl">
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
           ReviewBoard

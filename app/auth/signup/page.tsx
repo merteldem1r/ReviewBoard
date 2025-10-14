@@ -2,31 +2,62 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<{ status: "success" | "error"; text: string } | null>(null);
+  const router = useRouter();
 
-  const handleEmailSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage("");
+    setMessage(null);
 
     try {
-      const result = await signIn("email", {
+      // Call our custom signup API
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage({ status: "error", text: data.error || "Something went wrong" });
+        setIsLoading(false);
+        return;
+      }
+
+      // Show success message and prompt to check email
+      if (data.requiresVerification) {
+        setMessage({
+          status: "success",
+          text: `Account created successfully! We've sent a verification email to ${email}. Please check your inbox and click the verification link.`
+        });
+        setIsLoading(false);
+        // Don't auto-signin, wait for email verification
+        return;
+      }
+
+      // If verification not required (shouldn't happen), auto sign-in
+      const result = await signIn("credentials", {
         email,
+        password,
         redirect: false,
-        callbackUrl: "/dashboard",
       });
 
       if (result?.error) {
-        setMessage("Error creating account. Please try again.");
+        setMessage({ status: "error", text: "Account created but sign in failed. Please sign in manually." });
       } else {
-        setMessage("Check your email for a magic link to complete sign up!");
+        router.push("/dashboard");
       }
     } catch (error) {
-      setMessage("An error occurred. Please try again.");
+      setMessage({ status: "error", text: "An error occurred. Please try again." });
     } finally {
       setIsLoading(false);
     }
@@ -45,8 +76,21 @@ export default function SignUpPage() {
         </div>
 
         <div className="bg-[#1a1a1a] rounded-lg shadow-xl p-8 border border-[#333]">
-          {/* Email Sign Up */}
-          <form onSubmit={handleEmailSignUp} className="space-y-4">
+          {/* Password Sign Up Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="johndoe"
+                required
+                disabled={isLoading}
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50"
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium mb-2">Email</label>
               <input
@@ -60,24 +104,39 @@ export default function SignUpPage() {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                disabled={isLoading}
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50"
+              />
+              <p className="text-xs text-gray-500 mt-1">At least 6 characters</p>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Creating Account..." : "Sign Up with Email"}
+              {isLoading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
 
           {message && (
             <div
               className={`mt-4 p-3 rounded-lg text-sm ${
-                message.includes("Check")
+                message.status === "success"
                   ? "bg-green-500/10 text-green-400 border border-green-500/20"
                   : "bg-red-500/10 text-red-400 border border-red-500/20"
               }`}
             >
-              {message}
+              {message.text}
             </div>
           )}
 
