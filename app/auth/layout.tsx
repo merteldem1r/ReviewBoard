@@ -14,9 +14,5 @@ export default async function AuthLayout({
     redirect("/dashboard");
   }
 
-  return (
-    <>
-      <Providers>{children}</Providers>
-    </>
-  );
+  return <Providers>{children}</Providers>;
 }

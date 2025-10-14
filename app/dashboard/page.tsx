@@ -1,7 +1,5 @@
-import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -25,12 +23,11 @@ export default async function DashboardPage() {
           </div>
           <div className="flex gap-2">
             <Link
-              href="/profile"
+              href="/dashboard/profile"
               className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all cursor-pointer"
             >
               Profile
             </Link>
-            <SignOut />
           </div>
         </div>
 
@@ -52,10 +49,10 @@ export default async function DashboardPage() {
 
         {/* Actions */}
         <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-8">
-          <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
+          <h2 className="text-xl font-bold mb-4">Manage Items</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Link
-              href="/items"
+              href="/dashboard/items"
               className="p-6 bg-[#0a0a0a] border border-[#333] rounded-lg hover:border-blue-500 transition-all group"
             >
               <div className="text-2xl mb-2">📋</div>
@@ -67,7 +64,7 @@ export default async function DashboardPage() {
               </p>
             </Link>
             <Link
-              href="/items/new"
+              href="/dashboard/items/new"
               className="p-6 bg-[#0a0a0a] border border-[#333] rounded-lg hover:border-blue-500 transition-all group"
             >
               <div className="text-2xl mb-2">➕</div>
