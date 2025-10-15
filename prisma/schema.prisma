@@ -76,14 +76,13 @@ model VerificationToken {
 }
 
 model Tag {
-  id          String   @id @default(cuid())
-  name        String   @unique // "AI", "Fintech", "Healthcare", etc.
-  description String?
-  risk_score  Int      @default(0) @map("risk_score") // Base risk score for this tag
-  color       String   @default("#6B7280") // Hex color for UI
-  is_active   Boolean  @default(true) @map("is_active")
-  created_at  DateTime @default(now()) @map("created_at")
-  updated_at  DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  name       String   @unique // "AI", "Fintech", "Healthcare", etc.
+  risk_score Int      @default(0) @map("risk_score") // Base risk score for this tag
+  color      String   @default("#6B7280") // Hex color for UI
+  is_active  Boolean  @default(true) @map("is_active")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
 
   @@map("tags")
 }
@@ -115,15 +114,17 @@ enum ItemStatus {
 }
 
 model Rule {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  rule_type   RuleType @map("rule_type") // "AMOUNT_THRESHOLD", "TAG_MULTIPLIER", etc.
-  condition   String // JSON string with rule logic
-  score       Int // Points to add
-  is_active   Boolean  @default(true) @map("is_active")
-  created_at  DateTime @default(now()) @map("created_at")
-  updated_at  DateTime @updatedAt @map("updated_at")
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  rule_type       RuleType @default(AMOUNT_THRESHOLD) @map("rule_type")
+  condition       Json
+  score           Int
+  is_current_rule Boolean  @default(false) @map("is_current_rule")
+
+  is_active  Boolean  @default(true) @map("is_active")
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @updatedAt @map("updated_at")
 
   @@map("rules")
 }
@@ -136,11 +137,11 @@ enum RuleType {
 
 // Audit log for tracking changes
 model AuditLog {
-  id         String   @id @default(cuid())
-  action     String // "CREATED", "STATUS_CHANGED", "UPDATED", etc.
-  old_value  String?  @map("old_value") // JSON string
-  new_value  String?  @map("new_value") // JSON string
-  created_at DateTime @default(now()) @map("created_at")
+  id          String             @id @default(cuid())
+  action_type AuditLogActionType @default(CREATED) @map("action_type")
+  old_value   String?            @map("old_value") // JSON string
+  new_value   String?            @map("new_value") // JSON string
+  created_at  DateTime           @default(now()) @map("created_at")
 
   // Relations
   item_id String @map("item_id")
@@ -149,4 +150,10 @@ model AuditLog {
   user    User   @relation(fields: [user_id], references: [id])
 
   @@map("audit_logs")
+}
+
+enum AuditLogActionType {
+  CREATED
+  STATUS_CHANGED
+  UPDATED
 }
