@@ -82,7 +82,7 @@ model Tag {
   color      String   @default("#6B7280") // Hex color for UI
   is_active  Boolean  @default(true) @map("is_active")
   created_at DateTime @default(now()) @map("created_at")
-  updated_at DateTime @updatedAt @map("updated_at")
+  updated_at DateTime @updatedAt @map("updated_at") 
 
   @@map("tags")
 }
@@ -120,7 +120,6 @@ model Rule {
   rule_type       RuleType @default(AMOUNT_THRESHOLD) @map("rule_type")
   condition       Json
   score           Int
-  is_current_rule Boolean  @default(false) @map("is_current_rule")
 
   is_active  Boolean  @default(true) @map("is_active")
   created_at DateTime @default(now()) @map("created_at")
