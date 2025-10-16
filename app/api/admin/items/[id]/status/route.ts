@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,47 +14,46 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (session.user.role !== "REVIEWER") {
+    // Check if user is ADMIN
+    if (session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { status } = await req.json();
-    const itemId = params.id;
+    const { id: itemId } = await params;
 
+    // Validate status
     const validStatuses = ["NEW", "IN_REVIEW", "APPROVED", "REJECTED"];
     if (!validStatuses.includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
-    // Get current item data for audit log
-    const currentItem = await prisma.item.findUnique({
+    // Get the old item data for audit log
+    const oldItem = await prisma.item.findUnique({
       where: { id: itemId },
-      select: {
-        status: true,
-        title: true,
-      },
+      select: { status: true },
     });
 
-    if (!currentItem) {
+    if (!oldItem) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
     }
 
     // Update item status
-    const updatedItem = await prisma.item.update({
+    const item = await prisma.item.update({
       where: { id: itemId },
       data: { status },
       include: {
-        user: {
-          select: {
-            username: true,
-            email: true,
-          },
-        },
         tags: {
           select: {
             id: true,
             name: true,
             color: true,
+          },
+        },
+        user: {
+          select: {
+            username: true,
+            email: true,
           },
         },
       },
@@ -64,23 +63,18 @@ export async function PATCH(
     await prisma.auditLog.create({
       data: {
         action_type: "STATUS_CHANGED",
+        old_value: { status: oldItem.status },
+        new_value: { status },
         item_id: itemId,
         user_id: session.user.id,
-        old_value: JSON.stringify({
-          status: currentItem.status,
-        }),
-        new_value: JSON.stringify({
-          status,
-          changed_by: session.user.username,
-        }),
       },
     });
 
-    return NextResponse.json({ item: updatedItem });
+    return NextResponse.json({ item });
   } catch (error) {
-    console.error("Update status error:", error);
+    console.error("Failed to update item status:", error);
     return NextResponse.json(
-      { error: "Failed to update status" },
+      { error: "Failed to update item status" },
       { status: 500 }
     );
   }

@@ -14,6 +14,7 @@ interface Item {
   risk_score: number | null;
   created_at: string;
   user: User;
+  is_active: boolean;
 }
 
 interface Tag {
@@ -22,7 +23,7 @@ interface Tag {
   color: string;
 }
 
-export default function ReviewerItemsPage() {
+export default function AdminItemsPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +33,7 @@ export default function ReviewerItemsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [riskFilter, setRiskFilter] = useState("");
   const [tagFilter, setTagFilter] = useState("");
+  const [activeFilter, setActiveFilter] = useState("active"); // active, inactive, all
 
   // Fetch tags for filter dropdown
   useEffect(() => {
@@ -55,6 +57,9 @@ export default function ReviewerItemsPage() {
         const params = new URLSearchParams();
         if (statusFilter) params.append("status", statusFilter);
         if (tagFilter) params.append("tag", tagFilter);
+        if (activeFilter !== "all") {
+          params.append("is_active", activeFilter === "active" ? "true" : "false");
+        }
 
         if (riskFilter === "low") {
           params.append("minRisk", "0");
@@ -68,7 +73,7 @@ export default function ReviewerItemsPage() {
         }
 
         const response = await fetch(
-          `/api/reviewer/items?${params.toString()}`
+          `/api/admin/items?${params.toString()}`
         );
         const data = await response.json();
         setItems(data.items);
@@ -79,12 +84,12 @@ export default function ReviewerItemsPage() {
       }
     }
     fetchItems();
-  }, [statusFilter, riskFilter, tagFilter]);
+  }, [statusFilter, riskFilter, tagFilter, activeFilter]);
 
   const handleStatusChange = async (itemId: string, newStatus: string) => {
     setChangingStatus(itemId);
     try {
-      const response = await fetch(`/api/reviewer/items/${itemId}/status`, {
+      const response = await fetch(`/api/admin/items/${itemId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -103,6 +108,33 @@ export default function ReviewerItemsPage() {
     } catch (error) {
       console.error("Error updating status:", error);
       alert("Failed to update status");
+    } finally {
+      setChangingStatus(null);
+    }
+  };
+
+  const handleToggleActive = async (item: Item) => {
+    setChangingStatus(item.id);
+    try {
+      const response = await fetch(`/api/admin/items/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: !item.is_active }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update item");
+      }
+
+      // Update local state
+      setItems((prevItems) =>
+        prevItems.map((i) =>
+          i.id === item.id ? { ...i, is_active: !item.is_active } : i
+        )
+      );
+    } catch (error) {
+      console.error("Error updating item:", error);
+      alert("Failed to update item");
     } finally {
       setChangingStatus(null);
     }
@@ -162,29 +194,27 @@ export default function ReviewerItemsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Review Items</h1>
-            <p className="text-gray-400">
-              Manage and review all submitted items
-            </p>
+            <h1 className="text-3xl font-bold mb-2">Items Management</h1>
+            <p className="text-gray-400">Manage all items and their status</p>
           </div>
           <Link
-            href="/dashboard/reviewer"
+            href="/dashboard/admin"
             className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all text-center"
           >
-            ← Back to Dashboard
+            ← Back to Admin Dashboard
           </Link>
         </div>
 
         {/* Filters */}
         <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Status</label>
               <select
                 value={statusFilter}
                 disabled={isLoading}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
               >
                 <option value="">All</option>
                 <option value="NEW">New</option>
@@ -201,7 +231,7 @@ export default function ReviewerItemsPage() {
                 value={riskFilter}
                 onChange={(e) => setRiskFilter(e.target.value)}
                 disabled={isLoading}
-                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
               >
                 <option value="">All</option>
                 <option value="low">Low (0-30)</option>
@@ -215,7 +245,7 @@ export default function ReviewerItemsPage() {
                 value={tagFilter}
                 onChange={(e) => setTagFilter(e.target.value)}
                 disabled={isLoading}
-                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
               >
                 <option value="">All</option>
                 {tags.map((tag) => (
@@ -223,6 +253,21 @@ export default function ReviewerItemsPage() {
                     {tag.name}
                   </option>
                 ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Item Status
+              </label>
+              <select
+                value={activeFilter}
+                onChange={(e) => setActiveFilter(e.target.value)}
+                disabled={isLoading}
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              >
+                <option value="all">All Items</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Deactivated Only</option>
               </select>
             </div>
           </div>
@@ -240,7 +285,7 @@ export default function ReviewerItemsPage() {
           <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-12 text-center">
             <h2 className="text-xl font-bold mb-2">No items found</h2>
             <p className="text-gray-400">
-              {statusFilter || riskFilter || tagFilter
+              {statusFilter || riskFilter || tagFilter || activeFilter !== "all"
                 ? "Try adjusting your filters"
                 : "No items have been submitted yet"}
             </p>
@@ -253,13 +298,22 @@ export default function ReviewerItemsPage() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-[#1a1a1a] rounded-lg border border-[#333] p-4 sm:p-6"
+                className={`bg-[#1a1a1a] rounded-lg border border-[#333] p-4 sm:p-6 ${
+                  !item.is_active ? "opacity-60" : ""
+                }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg sm:text-xl font-bold mb-2">
-                      {item.title}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-lg sm:text-xl font-bold">
+                        {item.title}
+                      </h3>
+                      {!item.is_active && (
+                        <span className="px-2 py-1 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
+                          DEACTIVATED
+                        </span>
+                      )}
+                    </div>
                     <p className="text-gray-400 text-sm line-clamp-2">
                       {item.description}
                     </p>
@@ -326,38 +380,58 @@ export default function ReviewerItemsPage() {
                     </div>
                   </div>
 
-                  {/* Status Change Dropdown */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-[#333]">
-                    <label className="text-sm text-gray-400">
-                      Change Status:
-                    </label>
-                    <select
-                      value={item.status}
-                      onChange={(e) =>
-                        handleStatusChange(item.id, e.target.value)
-                      }
+                  {/* Actions */}
+                  <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-[#333]">
+                    {/* Status Change Dropdown */}
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-400">
+                        Change Status:
+                      </label>
+                      <select
+                        value={item.status}
+                        onChange={(e) =>
+                          handleStatusChange(item.id, e.target.value)
+                        }
+                        disabled={changingStatus === item.id || !item.is_active}
+                        className="bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <option value="NEW" disabled={item.status === "NEW"}>
+                          {item.status === "NEW" ? "✓ " : ""}New
+                        </option>
+                        <option
+                          value="IN_REVIEW"
+                          disabled={item.status === "IN_REVIEW"}
+                        >
+                          {item.status === "IN_REVIEW" ? "✓ " : ""}In Review
+                        </option>
+                        <option
+                          value="APPROVED"
+                          disabled={item.status === "APPROVED"}
+                        >
+                          {item.status === "APPROVED" ? "✓ " : ""}Approved
+                        </option>
+                        <option
+                          value="REJECTED"
+                          disabled={item.status === "REJECTED"}
+                        >
+                          {item.status === "REJECTED" ? "✓ " : ""}Rejected
+                        </option>
+                      </select>
+                    </div>
+
+                    {/* Deactivate/Activate Button */}
+                    <button
+                      onClick={() => handleToggleActive(item)}
                       disabled={changingStatus === item.id}
-                      className="bg-[#0a0a0a] border border-[#333] rounded-lg text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50 ${
+                        item.is_active
+                          ? "bg-red-600 hover:bg-red-700 text-white"
+                          : "bg-green-600 hover:bg-green-700 text-white"
+                      }`}
                     >
-                      <option
-                        value="IN_REVIEW"
-                        disabled={item.status === "IN_REVIEW"}
-                      >
-                        In Review
-                      </option>
-                      <option
-                        value="APPROVED"
-                        disabled={item.status === "APPROVED"}
-                      >
-                        Approved
-                      </option>
-                      <option
-                        value="REJECTED"
-                        disabled={item.status === "REJECTED"}
-                      >
-                        Rejected
-                      </option>
-                    </select>
+                      {item.is_active ? "Deactivate Item" : "Activate Item"}
+                    </button>
+
                     {changingStatus === item.id && (
                       <span className="text-xs text-gray-400">Updating...</span>
                     )}

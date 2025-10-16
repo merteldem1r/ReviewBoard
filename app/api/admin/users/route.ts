@@ -11,12 +11,20 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (session.user.role !== "REVIEWER") {
+    // Check if user is ADMIN
+    if (session.user.role !== "ADMIN") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const role = searchParams.get("role");
+
     const users = await prisma.user.findMany({
-      where: { role: "USER" },
+      where: {
+        role: {
+          not: "ADMIN",
+        },
+      },
       select: {
         id: true,
         username: true,
@@ -36,7 +44,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ users });
   } catch (error) {
-    console.error("Fetch users error:", error);
+    console.error("Failed to fetch users:", error);
     return NextResponse.json(
       { error: "Failed to fetch users" },
       { status: 500 }

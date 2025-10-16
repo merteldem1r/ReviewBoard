@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface User {
   id: string;
@@ -17,16 +17,12 @@ interface User {
 export default function ReviewerUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [roleFilter, setRoleFilter] = useState("");
 
   useEffect(() => {
     async function fetchUsers() {
       setIsLoading(true);
       try {
-        const params = new URLSearchParams();
-        if (roleFilter) params.append("role", roleFilter);
-
-        const response = await fetch(`/api/reviewer/users?${params.toString()}`);
+        const response = await fetch("/api/reviewer/users");
         const data = await response.json();
         setUsers(data.users);
       } catch (error) {
@@ -36,7 +32,7 @@ export default function ReviewerUsersPage() {
       }
     }
     fetchUsers();
-  }, [roleFilter]);
+  }, []);
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -65,7 +61,7 @@ export default function ReviewerUsersPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Manage Users</h1>
+            <h1 className="text-3xl font-bold mb-2">All Users</h1>
             <p className="text-gray-400">View all registered users</p>
           </div>
           <Link
@@ -74,24 +70,6 @@ export default function ReviewerUsersPage() {
           >
             ← Back to Dashboard
           </Link>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-6 mb-6">
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium">Filter by Role:</label>
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              disabled={isLoading}
-              className="bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-            >
-              <option value="">All Roles</option>
-              <option value="USER">User</option>
-              <option value="REVIEWER">Reviewer</option>
-              <option value="ADMIN">Admin</option>
-            </select>
-          </div>
         </div>
 
         {/* Loading State */}
@@ -105,9 +83,6 @@ export default function ReviewerUsersPage() {
         {!isLoading && users.length === 0 && (
           <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-12 text-center">
             <h2 className="text-xl font-bold mb-2">No users found</h2>
-            <p className="text-gray-400">
-              {roleFilter ? "Try adjusting your filters" : "No users registered yet"}
-            </p>
           </div>
         )}
 

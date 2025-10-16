@@ -97,6 +97,7 @@ model Item {
   amount      Decimal    @db.Decimal(12, 2)
   status      ItemStatus @default(NEW)
   risk_score  Int?       @map("risk_score")
+  is_active   Boolean    @default(true) @map("is_active")
   created_at  DateTime   @default(now()) @map("created_at")
   updated_at  DateTime   @updatedAt @map("updated_at")
 
