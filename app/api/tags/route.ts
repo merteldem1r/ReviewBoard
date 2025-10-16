@@ -10,6 +10,12 @@ export async function GET() {
       orderBy: {
         name: "asc",
       },
+      select: {
+        id: true,
+        score: true,
+        name: true,
+        color: true,
+      },
     });
 
     return NextResponse.json({ tags });

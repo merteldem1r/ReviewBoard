@@ -15,7 +15,7 @@ export default function NewItemPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoadingTags, setIsLoadingTags] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,11 +40,11 @@ export default function NewItemPage() {
     fetchTags();
   }, []);
 
-  const handleTagToggle = (tagName: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagName)
-        ? prev.filter((t) => t !== tagName)
-        : [...prev, tagName]
+  const handleTagToggle = (tagId: string) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId]
     );
   };
 
@@ -55,7 +55,7 @@ export default function NewItemPage() {
 
     try {
       // Validate
-      if (!title || !description || !amount || selectedTags.length === 0) {
+      if (!title || !description || !amount || selectedTagIds.length === 0) {
         setMessage({
           status: "error",
           text: "Please fill in all fields and select at least one tag",
@@ -72,7 +72,7 @@ export default function NewItemPage() {
           title,
           description,
           amount: parseFloat(amount),
-          tags: selectedTags,
+          tagIds: selectedTagIds,
         }),
       });
 
@@ -181,31 +181,31 @@ export default function NewItemPage() {
                       <button
                         key={tag.id}
                         type="button"
-                        onClick={() => handleTagToggle(tag.name)}
+                        onClick={() => handleTagToggle(tag.id)}
                         disabled={isSubmitting}
                         className={`px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 cursor-pointer ${
-                          selectedTags.includes(tag.name)
+                          selectedTagIds.includes(tag.id)
                             ? "border-2"
                             : "border border-[#444] hover:border-[#666]"
                         }`}
                         style={{
-                          backgroundColor: selectedTags.includes(tag.name)
+                          backgroundColor: selectedTagIds.includes(tag.id)
                             ? `${tag.color}20`
                             : "transparent",
-                          borderColor: selectedTags.includes(tag.name)
+                          borderColor: selectedTagIds.includes(tag.id)
                             ? tag.color
                             : undefined,
-                          color: selectedTags.includes(tag.name)
+                          color: selectedTagIds.includes(tag.id)
                             ? tag.color
                             : "#999",
                         }}
                       >
                         {tag.name}
-                        {selectedTags.includes(tag.name) && " ✓"}
+                        {selectedTagIds.includes(tag.id) && " ✓"}
                       </button>
                     ))}
                   </div>
-                  {selectedTags.length === 0 && (
+                  {selectedTagIds.length === 0 && (
                     <p className="text-sm text-gray-500 mt-3">
                       Select at least one tag
                     </p>
@@ -232,7 +232,7 @@ export default function NewItemPage() {
               <button
                 type="submit"
                 disabled={
-                  isLoadingTags || isSubmitting || selectedTags.length === 0
+                  isLoadingTags || isSubmitting || selectedTagIds.length === 0
                 }
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >

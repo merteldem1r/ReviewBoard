@@ -1,8 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { calculateRiskScore } from "@/lib/risk-calculator";
+import { calculateRiskScore } from "@/lib/items/risk-calculator";
+import { getServerSession } from "next-auth";
+import { NextResponse } from "next/server";
+
+export interface TagNameRiskScore {
+  name: string;
+  risk_score: number;
+}
 
 export async function POST(req: Request) {
   try {
@@ -12,62 +17,111 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, description, amount, tags } = await req.json();
+    const { title, description, amount, tagIds } = await req.json();
 
     // Validate input
-    if (!title || !description || !amount || !tags || !Array.isArray(tags)) {
+    if (
+      !title ||
+      !description ||
+      !amount ||
+      !tagIds ||
+      !Array.isArray(tagIds)
+    ) {
       return NextResponse.json(
-        { error: "Title, description, amount, and tags are required" },
+        { error: "Title, description, amount, and tagIds are required" },
         { status: 400 }
       );
     }
 
-    if (tags.length === 0) {
+    if (tagIds.length === 0) {
       return NextResponse.json(
         { error: "At least one tag is required" },
         { status: 400 }
       );
     }
 
-    // Calculate risk score
-    const { totalScore, breakdown } = await calculateRiskScore({
-      amount: parseFloat(amount),
-      tags,
+    // Fetch the selected tags to get their names for risk calculation
+    const selectedTags = await prisma.tag.findMany({
+      where: {
+        id: { in: tagIds },
+        is_active: true,
+      },
     });
 
-    // Create item
+    if (selectedTags.length === 0) {
+      return NextResponse.json(
+        { error: "Invalid tag IDs provided" },
+        { status: 400 }
+      );
+    }
+
+    // tag names and risk_score of each
+    const tagNamesRiskScore: TagNameRiskScore[] = selectedTags.map((tag) => ({
+      name: tag.name,
+      risk_score: tag.score,
+    }));
+
+    // risk score
+    let totalScore: number;
+    try {
+      const scoreResult = await calculateRiskScore({
+        amount: parseFloat(amount),
+        tagNamesRiskScore,
+      });
+      totalScore = scoreResult.totalScore;
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Failed to calculate risk score" },
+        { status: 500 }
+      );
+    }
+
+    // item create
     const item = await prisma.item.create({
       data: {
         title,
         description,
         amount: parseFloat(amount),
-        tags,
         risk_score: totalScore,
         status: "NEW",
-        created_by_id: session.user.id,
+        user_id: session.user.id,
+        tags: {
+          connect: tagIds.map((id) => ({ id })),
+        },
       },
       include: {
-        created_by: {
+        user: {
           select: {
             username: true,
             email: true,
+            role: true,
+          },
+        },
+        tags: {
+          select: {
+            name: true,
+            color: true,
           },
         },
       },
     });
 
-    // Create audit log for item creation
+    // audit log
+    const tagNames = selectedTags.map((tag) => {
+      return tag.name;
+    });
+
     await prisma.auditLog.create({
       data: {
         action_type: "CREATED",
         item_id: item.id,
         user_id: session.user.id,
-        old_value: null,
+        old_value: undefined,
         new_value: JSON.stringify({
           title: item.title,
           status: "NEW",
           risk_score: totalScore,
-          breakdown,
+          tag_names: tagNames,
         }),
       },
     });
@@ -75,7 +129,6 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         item,
-        riskBreakdown: breakdown,
       },
       { status: 201 }
     );
@@ -98,7 +151,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status");
-    const tag = searchParams.get("tag");
+    const tagName = searchParams.get("tag");
     const minRisk = searchParams.get("minRisk");
     const maxRisk = searchParams.get("maxRisk");
 
@@ -109,8 +162,13 @@ export async function GET(req: Request) {
       where.status = status;
     }
 
-    if (tag) {
-      where.tags = { has: tag };
+    // Filter by tag name using relation
+    if (tagName) {
+      where.tags = {
+        some: {
+          name: tagName, // ✅ Filter items that have this tag
+        },
+      };
     }
 
     if (minRisk || maxRisk) {
@@ -119,14 +177,21 @@ export async function GET(req: Request) {
       if (maxRisk) where.risk_score.lte = parseInt(maxRisk);
     }
 
-    // Fetch items
+    // Fetch items with populated tags
     const items = await prisma.item.findMany({
       where,
       include: {
-        created_by: {
+        user: {
           select: {
             username: true,
             email: true,
+          },
+        },
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            color: true,
           },
         },
       },
