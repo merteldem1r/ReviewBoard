@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { User } from "@prisma/client";
-import ItemCard from "@/components/ItemCard";
+import ItemCard from "@/components/items/ItemCard";
 
 interface Item {
   id: string;

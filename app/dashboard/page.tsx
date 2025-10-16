@@ -1,6 +1,9 @@
+import ItemStats from "@/components/items/ItemStats";
+import { StatsLoadingSkeleton } from "@/components/skeletons/ItemLoadingSkeleton";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
@@ -27,20 +30,9 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#333]">
-            <div className="text-gray-400 text-sm mb-1">Total Items</div>
-            <div className="text-3xl font-bold">0</div>
-          </div>
-          <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#333]">
-            <div className="text-gray-400 text-sm mb-1">Pending Review</div>
-            <div className="text-3xl font-bold">0</div>
-          </div>
-          <div className="bg-[#1a1a1a] p-6 rounded-lg border border-[#333]">
-            <div className="text-gray-400 text-sm mb-1">Approved</div>
-            <div className="text-3xl font-bold">0</div>
-          </div>
-        </div>
+        <Suspense fallback={<StatsLoadingSkeleton />}>
+          <ItemStats />
+        </Suspense>
 
         {/* Actions */}
         <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-8">
