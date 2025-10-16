@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { User } from "@prisma/client";
 
 interface Tag {
@@ -73,10 +72,8 @@ export default function ItemCard({ item }: ItemCardProps) {
   };
 
   return (
-    <Link
-      href={`/dashboard/items/${item.id}`}
-      className="block bg-[#1a1a1a] rounded-lg border border-[#333] hover:border-[#444] p-4 sm:p-6 transition-all"
-    >
+    <div className="block bg-[#1a1a1a] rounded-lg border border-[#333] hover:border-[#444] p-4 sm:p-6 transition-all">
+      {/* TODO: Create item detail page at /dashboard/user/items/[id] */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-4">
         <div className="flex-1">
           <h3 className="text-lg sm:text-xl font-bold mb-2">{item.title}</h3>
@@ -141,6 +138,6 @@ export default function ItemCard({ item }: ItemCardProps) {
           })}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

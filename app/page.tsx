@@ -1,9 +1,13 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import getDashboardURL from "./utils/getDashboardURL";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
+
+  const userRole: string = session?.user.role;
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-[#0a0a0a] px-4 overflow-hidden relative z-50">
@@ -22,7 +26,7 @@ export default async function HomePage() {
 
         <div className="flex gap-4 justify-center">
           <Link
-            href={session?.user ? "/dashboard" : "/auth/signin"}
+            href={session?.user ? getDashboardURL(userRole) : "/auth/signin"}
             className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all"
           >
             {session?.user ? "Dashboard" : "Sign In"}

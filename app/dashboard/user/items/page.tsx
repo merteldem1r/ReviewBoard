@@ -98,7 +98,7 @@ export default function ItemsPage() {
               Dashboard
             </Link>
             <Link
-              href="/dashboard/items/new"
+              href="/dashboard/user/items/new"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-center"
             >
               + New Item
@@ -180,7 +180,7 @@ export default function ItemsPage() {
                 : "Get started by creating your first item for review"}
             </p>
             <Link
-              href="/dashboard/items/new"
+              href="/dashboard/user/items/new"
               className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
             >
               Create First Item

@@ -90,7 +90,7 @@ export default function NewItemPage() {
       // Success - redirect to items list
       setMessage({ status: "success", text: "Item created successfully!" });
       setTimeout(() => {
-        router.push("/dashboard/items");
+        router.push("/dashboard/user/items");
       }, 1500);
     } catch (error) {
       setMessage({
@@ -240,7 +240,7 @@ export default function NewItemPage() {
               </button>
               <button
                 type="button"
-                onClick={() => router.push("/dashboard/items")}
+                onClick={() => router.push("/dashboard/user/items")}
                 disabled={isSubmitting}
                 className="px-6 bg-[#0a0a0a] hover:bg-black border border-[#333] text-white font-medium py-3 rounded-lg transition-all disabled:opacity-50 cursor-pointer"
               >

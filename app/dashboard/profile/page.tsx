@@ -1,15 +1,17 @@
+import getDashboardURL from "@/app/utils/getDashboardURL";
 import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
+  const userRole: string = session?.user.role;
 
-  if (!session) {
+  if (!session || !session?.user) {
     return;
   }
 
-  const { username, email, role, created_at } = session?.user;
+  const { username, email, role, created_at } = session.user;
 
   const formatDate = (date: string | Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -113,7 +115,7 @@ export default async function Profile() {
           <div className="border-t border-[#333] p-6 bg-[#0a0a0a]/50">
             <div className="flex gap-3">
               <a
-                href="/dashboard"
+                href={getDashboardURL(userRole)}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium"
               >
                 Dashboard
