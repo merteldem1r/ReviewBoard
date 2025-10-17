@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,7 +19,7 @@ export async function PATCH(
     }
 
     const { status } = await req.json();
-    const itemId = params.id;
+    const { id: itemId } = await params;
 
     const validStatuses = ["NEW", "IN_REVIEW", "APPROVED", "REJECTED"];
     if (!validStatuses.includes(status)) {
