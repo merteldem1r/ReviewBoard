@@ -1,5 +1,6 @@
 import ItemStats from "@/components/items/ItemStats";
 import { StatsLoadingSkeleton } from "@/components/skeletons/ItemLoadingSkeleton";
+import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -26,6 +27,7 @@ export default async function DashboardPage() {
             >
               Profile
             </Link>
+            <SignOut />
           </div>
         </div>
 

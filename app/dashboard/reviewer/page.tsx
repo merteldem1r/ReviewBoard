@@ -2,6 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import ReviewerStats from "@/components/reviewer/ReviewerStats";
+import { SignOut } from "@/components/ui/signOut";
 
 export default async function ReviewerDashboardPage() {
   const session = await getServerSession(authOptions);
@@ -24,6 +25,7 @@ export default async function ReviewerDashboardPage() {
             >
               Profile
             </Link>
+            <SignOut />
           </div>
         </div>
 

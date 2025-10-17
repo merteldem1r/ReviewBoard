@@ -1,4 +1,5 @@
 import AdminStats from "@/components/admin/AdminStats";
+import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -25,6 +26,7 @@ export default async function AdminDashboardPage() {
             >
               Profile
             </Link>
+            <SignOut />
           </div>
         </div>
 
