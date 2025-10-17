@@ -3,7 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-export async function PATCH(req: Request) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -16,7 +19,8 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { status, itemId } = await req.json();
+    const { status } = await req.json();
+    const { id: itemId } = await params;
 
     // Validate status
     const validStatuses = ["NEW", "IN_REVIEW", "APPROVED", "REJECTED"];

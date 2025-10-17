@@ -90,10 +90,10 @@ export default function AdminItemsPage() {
   const handleStatusChange = async (itemId: string, newStatus: string) => {
     setChangingStatus(itemId);
     try {
-      const response = await fetch(`/api/admin/items/status`, {
+      const response = await fetch(`/api/admin/items/${itemId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId, status: newStatus }),
+        body: JSON.stringify({ status: newStatus }),
       });
 
       if (!response.ok) {
