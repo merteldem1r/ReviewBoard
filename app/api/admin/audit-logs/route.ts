@@ -20,14 +20,25 @@ export async function GET(req: Request) {
     const actionType = searchParams.get("actionType");
     const userId = searchParams.get("userId");
     const itemId = searchParams.get("itemId");
-    const limit = searchParams.get("limit");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
+    // Calculate skip for pagination
+    const skip = (page - 1) * limit;
+
+    // Build where clause
+    const where = {
+      ...(actionType && { action_type: actionType as any }),
+      ...(userId && { user_id: userId }),
+      ...(itemId && { item_id: itemId }),
+    };
+
+    // Get total count for pagination
+    const totalCount = await prisma.auditLog.count({ where });
+
+    // Get paginated audit logs
     const auditLogs = await prisma.auditLog.findMany({
-      where: {
-        ...(actionType && { action_type: actionType as any }),
-        ...(userId && { user_id: userId }),
-        ...(itemId && { item_id: itemId }),
-      },
+      where,
       include: {
         user: {
           select: {
@@ -48,10 +59,17 @@ export async function GET(req: Request) {
       orderBy: {
         created_at: "desc",
       },
-      take: limit ? parseInt(limit) : 100,
+      skip,
+      take: limit,
     });
 
-    return NextResponse.json({ auditLogs });
+    return NextResponse.json({ 
+      auditLogs,
+      totalCount,
+      page,
+      limit,
+      totalPages: Math.ceil(totalCount / limit),
+    });
   } catch (error) {
     console.error("Failed to fetch audit logs:", error);
     return NextResponse.json(

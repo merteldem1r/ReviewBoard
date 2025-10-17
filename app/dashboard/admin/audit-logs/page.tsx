@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type AuditLog = {
   id: string;
-  action_type: "CREATED" | "STATUS_CHANGED" | "UPDATED";
+  action_type: "CREATED" | "STATUS_CHANGED" | "STATUS_CHANGED_BY_SYSTEM" | "UPDATED";
   old_value: any;
   new_value: any;
   created_at: string;
@@ -25,11 +25,13 @@ export default function AuditLogsPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionTypeFilter, setActionTypeFilter] = useState<string>("all");
-  const [limit, setLimit] = useState<number>(100);
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
+  const [totalCount, setTotalCount] = useState<number>(0);
 
   useEffect(() => {
     fetchAuditLogs();
-  }, [actionTypeFilter, limit]);
+  }, [actionTypeFilter, page, limit]);
 
   const fetchAuditLogs = async () => {
     try {
@@ -38,17 +40,32 @@ export default function AuditLogsPage() {
       if (actionTypeFilter !== "all") {
         params.append("actionType", actionTypeFilter);
       }
+      params.append("page", page.toString());
       params.append("limit", limit.toString());
 
       const response = await fetch(`/api/admin/audit-logs?${params}`);
       if (!response.ok) throw new Error("Failed to fetch audit logs");
       const data = await response.json();
       setAuditLogs(data.auditLogs);
+      setTotalCount(data.totalCount);
     } catch (error) {
       console.error("Error fetching audit logs:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1); // Reset to first page when limit changes
   };
 
   const getActionTypeColor = (actionType: string) => {
@@ -57,8 +74,10 @@ export default function AuditLogsPage() {
         return "text-green-400 bg-green-400/10 border-green-400/20";
       case "STATUS_CHANGED":
         return "text-blue-400 bg-blue-400/10 border-blue-400/20";
-      case "UPDATED":
+      case "STATUS_CHANGED_BY_SYSTEM":
         return "text-yellow-400 bg-yellow-400/10 border-yellow-400/20";
+      case "UPDATED":
+        return "text-orange-400 bg-orange-400/10 border-orange-400/20";
       default:
         return "text-gray-400 bg-gray-400/10 border-gray-400/20";
     }
@@ -89,13 +108,16 @@ export default function AuditLogsPage() {
       );
     }
 
-    if (log.action_type === "STATUS_CHANGED") {
+    if (log.action_type === "STATUS_CHANGED" || log.action_type === "STATUS_CHANGED_BY_SYSTEM") {
       return (
         <div className="text-sm text-gray-400">
           Status changed from{" "}
           <span className="text-red-400 font-medium">{log.old_value?.status || "N/A"}</span>
           {" → "}
           <span className="text-green-400 font-medium">{log.new_value?.status || "N/A"}</span>
+          {log.action_type === "STATUS_CHANGED_BY_SYSTEM" && (
+            <span className="ml-2 text-xs text-yellow-400">(Automated)</span>
+          )}
         </div>
       );
     }
@@ -148,29 +170,34 @@ export default function AuditLogsPage() {
               </label>
               <select
                 value={actionTypeFilter}
-                onChange={(e) => setActionTypeFilter(e.target.value)}
+                onChange={(e) => {
+                  setActionTypeFilter(e.target.value);
+                  setPage(1); // Reset to first page when filter changes
+                }}
                 className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:outline-none focus:border-blue-500"
               >
                 <option value="all">All Actions</option>
                 <option value="CREATED">Created</option>
-                <option value="STATUS_CHANGED">Status Changed</option>
+                <option value="STATUS_CHANGED">Status Changed (Manual)</option>
+                <option value="STATUS_CHANGED_BY_SYSTEM">Status Changed (System)</option>
                 <option value="UPDATED">Updated</option>
               </select>
             </div>
 
             <div className="flex-1 min-w-[200px]">
               <label className="block text-sm font-medium mb-2">
-                Limit Results
+                Items Per Page
               </label>
               <select
                 value={limit}
-                onChange={(e) => setLimit(parseInt(e.target.value))}
+                onChange={(e) => handleLimitChange(parseInt(e.target.value))}
                 className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:outline-none focus:border-blue-500"
               >
-                <option value="5">Last 5</option>
-                <option value="25">Last 25</option>
-                <option value="50">Last 50</option>
-                <option value="100">Last 100</option>
+                <option value="5">5 per page</option>
+                <option value="10">10 per page</option>
+                <option value="25">25 per page</option>
+                <option value="50">50 per page</option>
+                <option value="100">100 per page</option>
               </select>
             </div>
           </div>
@@ -224,21 +251,32 @@ export default function AuditLogsPage() {
                       <div className="mt-3 pt-3 border-t border-[#333]">
                         <div className="flex items-center gap-2 text-xs text-gray-500">
                           <span>Performed by:</span>
-                          <span className="text-gray-300">
-                            {log.user.username}
-                          </span>
-                          <span className="text-gray-600">({log.user.email})</span>
-                          <span
-                            className={`px-2 py-0.5 rounded text-xs ${
-                              log.user.role === "ADMIN"
-                                ? "bg-purple-500/10 text-purple-400"
-                                : log.user.role === "REVIEWER"
-                                ? "bg-blue-500/10 text-blue-400"
-                                : "bg-gray-500/10 text-gray-400"
-                            }`}
-                          >
-                            {log.user.role}
-                          </span>
+                          {log.action_type === "STATUS_CHANGED_BY_SYSTEM" ? (
+                            <>
+                              <span className="text-gray-300">System</span>
+                              <span className="px-2 py-0.5 rounded text-xs bg-yellow-500/10 text-yellow-400">
+                                SYSTEM
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-gray-300">
+                                {log.user.username}
+                              </span>
+                              <span className="text-gray-600">({log.user.email})</span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs ${
+                                  log.user.role === "ADMIN"
+                                    ? "bg-purple-500/10 text-purple-400"
+                                    : log.user.role === "REVIEWER"
+                                    ? "bg-blue-500/10 text-blue-400"
+                                    : "bg-gray-500/10 text-gray-400"
+                                }`}
+                              >
+                                {log.user.role}
+                              </span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -249,10 +287,66 @@ export default function AuditLogsPage() {
           )}
         </div>
 
-        {/* Summary */}
+        {/* Pagination */}
         {!loading && auditLogs.length > 0 && (
-          <div className="mt-4 text-center text-sm text-gray-500">
-            Showing {auditLogs.length} audit log{auditLogs.length !== 1 ? "s" : ""}
+          <div className="mt-6 bg-[#1a1a1a] rounded-lg border border-[#333] p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-400">
+                Showing {(page - 1) * limit + 1} to {Math.min(page * limit, totalCount)} of {totalCount} audit logs
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(1)}
+                  disabled={page === 1}
+                  className="px-3 py-1 bg-[#0a0a0a] border border-[#333] rounded-lg hover:bg-[#222] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  First
+                </button>
+                
+                <button
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                  className="px-3 py-1 bg-[#0a0a0a] border border-[#333] rounded-lg hover:bg-[#222] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                
+                <div className="flex items-center gap-2 px-4">
+                  <span className="text-sm text-gray-400">Page</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max={totalPages}
+                    value={page}
+                    onChange={(e) => {
+                      const newPage = parseInt(e.target.value);
+                      if (newPage >= 1 && newPage <= totalPages) {
+                        setPage(newPage);
+                      }
+                    }}
+                    className="w-16 px-2 py-1 bg-[#0a0a0a] border border-[#333] rounded text-center focus:outline-none focus:border-blue-500"
+                  />
+                  <span className="text-sm text-gray-400">of {totalPages}</span>
+                </div>
+                
+                <button
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === totalPages}
+                  className="px-3 py-1 bg-[#0a0a0a] border border-[#333] rounded-lg hover:bg-[#222] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+                
+                <button
+                  onClick={() => handlePageChange(totalPages)}
+                  disabled={page === totalPages}
+                  className="px-3 py-1 bg-[#0a0a0a] border border-[#333] rounded-lg hover:bg-[#222] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Last
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
