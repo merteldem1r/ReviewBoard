@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "AuditLogActionType" ADD VALUE 'STATUS_CHANGED_BY_SYSTEM';

@@ -16,40 +16,81 @@ export const POST = async (req: NextRequest) => {
 
     if (authHeader !== `Bearer ${cronSecret}`) {
       console.error("Unauthorized cron attempt");
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      console.log(authHeader, cronSecret);
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     console.log("Cron job started: Auto-updating item statuses");
 
-    // for 1 hour ago
-    const oneHourAgo = new Date();
-    oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+    // Calculate timestamp for 1 hour ago
+    // Items created before this time (1+ hours old) will be updated
+    const minutesAgo30 = new Date();
+    minutesAgo30.setHours(minutesAgo30.getMinutes() - 30);
 
-    const updateResult = await prisma.item.updateMany({
+    // Find items to update
+    const itemsToUpdate = await prisma.item.findMany({
       where: {
         status: "NEW",
         is_active: true,
         created_at: {
-          lt: oneHourAgo,
+          lt: minutesAgo30,
         },
       },
-      data: {
-        status: "IN_REVIEW",
-        updated_at: new Date(),
+      select: {
+        id: true,
+        user_id: true,
+        status: true,
       },
     });
 
-    console.log(`Successfully updated ${updateResult.count} items to IN_REVIEW`);
+    if (itemsToUpdate.length === 0) {
+      console.log("No items to update");
+      return NextResponse.json(
+        {
+          message: "No items to update",
+          updated: 0,
+          timestamp: new Date().toISOString(),
+        },
+        { status: 200 }
+      );
+    }
+
+    const updateCount = await prisma.$transaction(async (tx) => {
+      let count = 0;
+
+      for (const item of itemsToUpdate) {
+        await tx.item.update({
+          where: { id: item.id },
+          data: {
+            status: "IN_REVIEW",
+            updated_at: new Date(),
+          },
+        });
+
+        await tx.auditLog.create({
+          data: {
+            item_id: item.id,
+            user_id: item.user_id,
+            action_type: "STATUS_CHANGED_BY_SYSTEM",
+            old_value: { status: item.status },
+            new_value: { status: "IN_REVIEW" },
+          },
+        });
+
+        count++;
+      }
+
+      return count;
+    });
+
+    console.log(
+      `Successfully updated ${updateCount} items to IN_REVIEW with audit logs`
+    );
 
     return NextResponse.json(
       {
-        message: updateResult.count > 0 
-          ? "Item statuses updated successfully" 
-          : "No items to update",
-        updated: updateResult.count,
+        message: "Item statuses updated successfully",
+        updated: updateCount,
         timestamp: new Date().toISOString(),
       },
       { status: 200 }
@@ -66,4 +107,3 @@ export const POST = async (req: NextRequest) => {
     );
   }
 };
-

@@ -156,5 +156,6 @@ model AuditLog {
 enum AuditLogActionType {
   CREATED
   STATUS_CHANGED
+  STATUS_CHANGED_BY_SYSTEM
   UPDATED
 }
