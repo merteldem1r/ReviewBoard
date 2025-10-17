@@ -35,7 +35,7 @@ export default async function ReviewerDashboardPage() {
         {/* Quick Actions */}
         <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-8">
           <h2 className="text-xl font-bold mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/dashboard/reviewer/items"
               className="p-6 bg-[#0a0a0a] border border-[#333] rounded-lg hover:border-blue-500 transition-all group"
@@ -58,6 +58,18 @@ export default async function ReviewerDashboardPage() {
               </h3>
               <p className="text-sm text-gray-400">
                 View all users and their activities
+              </p>
+            </Link>
+            <Link
+              href="/dashboard/system"
+              className="p-6 bg-[#0a0a0a] border border-[#333] rounded-lg hover:border-orange-500 transition-all group"
+            >
+              <div className="text-2xl mb-2">🔧</div>
+              <h3 className="font-bold mb-1 group-hover:text-orange-500">
+                System Information
+              </h3>
+              <p className="text-sm text-gray-400">
+                See the System related settings and information
               </p>
             </Link>
           </div>

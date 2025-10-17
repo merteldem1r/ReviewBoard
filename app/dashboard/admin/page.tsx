@@ -109,15 +109,15 @@ export default async function AdminDashboardPage() {
 
             {/* System Settings */}
             <Link
-              href="#"
+              href="/dashboard/system"
               className="p-6 bg-[#0a0a0a] border border-[#333] rounded-lg hover:border-orange-500 transition-all group"
             >
               <div className="text-2xl mb-2">🔧</div>
               <h3 className="font-bold mb-1 group-hover:text-orange-500">
-                System Settings
+                System Information
               </h3>
               <p className="text-sm text-gray-400">
-                Configure system-wide settings and preferences
+                See the System related settings and information
               </p>
             </Link>
           </div>
