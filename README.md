@@ -2,6 +2,8 @@
 
 A comprehensive review management system with automated workflows, risk scoring, and role-based access control.
 
+<img width="1700" height="825" alt="image" src="https://github.com/user-attachments/assets/c613a098-39cb-4918-ab97-901505543334" />
+
 ## Technology Stack
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.5-black?style=flat-square&logo=next.js)
@@ -24,11 +26,49 @@ ReviewBoard is an enterprise-grade review management platform designed to stream
 
 ## APP Preview
 
-### From User Role
+### User Perspective
 
-### From Reviewer Role
+#### Dashboard
 
-### From Admin Role
+<img width="1705" height="655" alt="image" src="https://github.com/user-attachments/assets/c9dbcc20-cd4c-4887-a4bf-8154e0e6fd40" />
+
+#### Items
+
+<img width="1698" height="479" alt="image" src="https://github.com/user-attachments/assets/e3f7996f-f794-41fe-9449-dc716cf3f54b" />
+
+
+### Reviewer Perspective
+
+#### Dashboard
+
+<img width="1701" height="692" alt="image" src="https://github.com/user-attachments/assets/146f8bba-f9ef-4aaf-b941-4bff3ba5e8f9" />
+
+#### Item Management
+
+<img width="1696" height="548" alt="image" src="https://github.com/user-attachments/assets/8ec5d570-9191-4460-9882-7d50cdfba748" />
+
+### Admin Perspective
+
+#### Dashboard
+
+<img width="1694" height="887" alt="image" src="https://github.com/user-attachments/assets/25b54a64-495f-4494-b3be-e6572ef9d455" />
+
+#### Tag Management
+
+<img width="1700" height="782" alt="image" src="https://github.com/user-attachments/assets/b251d222-b594-4f61-b78d-0c3a398fc8b1" />
+
+#### Rule Management
+
+<img width="1699" height="896" alt="image" src="https://github.com/user-attachments/assets/8b0f6cc5-e76a-4e61-b8dc-334bc2825a1d" />
+
+#### New Rule
+
+<img width="1698" height="884" alt="image" src="https://github.com/user-attachments/assets/873630fc-53ad-43a8-9203-0d5b25c298bf" />
+
+#### Audit Logs
+
+<img width="1701" height="867" alt="image" src="https://github.com/user-attachments/assets/897d7209-82de-4cd3-b468-528796030598" />
+
 
 ## Key Features
 
