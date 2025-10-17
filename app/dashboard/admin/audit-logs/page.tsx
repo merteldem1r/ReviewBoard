@@ -167,10 +167,10 @@ export default function AuditLogsPage() {
                 onChange={(e) => setLimit(parseInt(e.target.value))}
                 className="w-full px-4 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:outline-none focus:border-blue-500"
               >
+                <option value="5">Last 5</option>
+                <option value="25">Last 25</option>
                 <option value="50">Last 50</option>
                 <option value="100">Last 100</option>
-                <option value="250">Last 250</option>
-                <option value="500">Last 500</option>
               </select>
             </div>
           </div>
