@@ -236,6 +236,24 @@ export default async function SystemPage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 mb-1">
+                      Trigger Service
+                    </div>
+                    <div className="text-sm font-medium">
+                      <a
+                        href="https://console.cron-job.org/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 underline"
+                      >
+                        cron-job.org
+                      </a>
+                      <span className="text-gray-500 ml-1 text-xs">
+                        (External)
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
                       Trigger Condition
                     </div>
                     <div className="text-sm font-medium">
