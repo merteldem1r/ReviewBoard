@@ -2,6 +2,7 @@ import getDashboardURL from "@/app/utils/getDashboardURL";
 import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
@@ -114,12 +115,12 @@ export default async function Profile() {
           {/* Actions */}
           <div className="border-t border-[#333] p-6 bg-[#0a0a0a]/50">
             <div className="flex gap-3">
-              <a
+              <Link
                 href={getDashboardURL(userRole)}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium"
+                className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all text-center"
               >
-                Dashboard
-              </a>
+                ← Dashboard
+              </Link>
               <SignOut />
             </div>
           </div>

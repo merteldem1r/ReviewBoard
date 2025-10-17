@@ -17,13 +17,8 @@ export default async function AdminDashboardPage() {
               Welcome, @{session?.user?.username || "admin"}
             </p>
           </div>
+
           <div className="flex gap-4">
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all text-center"
-            >
-              Main Dashboard
-            </Link>
             <Link
               href="/dashboard/profile"
               className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all text-center"

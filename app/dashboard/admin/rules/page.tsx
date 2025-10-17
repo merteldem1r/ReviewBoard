@@ -103,7 +103,7 @@ export default function AdminRulesPage() {
             href="/dashboard/admin"
             className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all text-center"
           >
-            ← Back to Admin Dashboard
+            ← Admin Dashboard
           </Link>
         </div>
 
