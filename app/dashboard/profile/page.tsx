@@ -41,7 +41,7 @@ export default async function Profile() {
                 {username?.charAt(0).toUpperCase() || "U"}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">{username}</h2>
+                <h2 className="text-2xl font-bold text-white">@{username}</h2>
                 <p className="text-blue-100 capitalize">
                   {role?.toLowerCase() || "user"}
                 </p>
