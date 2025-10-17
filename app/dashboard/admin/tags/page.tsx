@@ -19,6 +19,7 @@ export default function AdminTagsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingTag, setEditingTag] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -27,6 +28,12 @@ export default function AdminTagsPage() {
     color: "#6B7280",
     is_active: true,
   });
+
+  // Edit mode state
+  const [editValues, setEditValues] = useState<{
+    score: string; // Keep as string to handle empty input
+    color: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchTags();
@@ -68,7 +75,7 @@ export default function AdminTagsPage() {
   };
 
   const handleUpdate = async (tagId: string, updates: Partial<Tag>) => {
-    setEditingTag(tagId);
+    setIsSaving(true);
     try {
       const response = await fetch(`/api/admin/tags/${tagId}`, {
         method: "PATCH",
@@ -85,12 +92,36 @@ export default function AdminTagsPage() {
       console.error("Error updating tag:", error);
       alert("Failed to update tag");
     } finally {
-      setEditingTag(null);
+      setIsSaving(false);
     }
   };
 
   const handleToggleActive = async (tag: Tag) => {
     await handleUpdate(tag.id, { is_active: !tag.is_active });
+  };
+
+  const startEditing = (tag: Tag) => {
+    setEditingTag(tag.id);
+    setEditValues({
+      score: tag.score.toString(),
+      color: tag.color,
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingTag(null);
+    setEditValues(null);
+  };
+
+  const saveEditing = async (tagId: string) => {
+    if (!editValues) return;
+    const scoreValue = parseInt(editValues.score) || 0;
+    await handleUpdate(tagId, {
+      score: scoreValue,
+      color: editValues.color,
+    });
+    setEditingTag(null);
+    setEditValues(null);
   };
 
   return (
@@ -220,71 +251,110 @@ export default function AdminTagsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#333]">
-                  {tags.map((tag) => (
-                    <tr key={tag.id} className="hover:bg-[#0a0a0a]/50">
-                      <td className="px-6 py-4">
-                        <span
-                          className="px-3 py-1 rounded-full text-sm font-medium border"
-                          style={{
-                            backgroundColor: `${tag.color}20`,
-                            borderColor: tag.color,
-                            color: tag.color,
-                          }}
-                        >
-                          {tag.name}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <input
-                          type="number"
-                          value={tag.score}
-                          onChange={(e) =>
-                            handleUpdate(tag.id, {
-                              score: parseInt(e.target.value),
-                            })
-                          }
-                          disabled={editingTag === tag.id}
-                          min="0"
-                          max="100"
-                          className="w-20 bg-[#0a0a0a] border border-[#333] rounded px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                        />
-                      </td>
-                      <td className="px-6 py-4">
-                        <input
-                          type="color"
-                          value={tag.color}
-                          onChange={(e) =>
-                            handleUpdate(tag.id, { color: e.target.value })
-                          }
-                          disabled={editingTag === tag.id}
-                          className="w-12 h-8 bg-[#0a0a0a] border border-[#333] rounded cursor-pointer!"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">
-                        {tag._count.items} items
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                            tag.is_active
-                              ? "bg-green-500/10 text-green-400 border-green-500/20"
-                              : "bg-gray-500/10 text-gray-400 border-gray-500/20"
-                          }`}
-                        >
-                          {tag.is_active ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleToggleActive(tag)}
-                          disabled={editingTag === tag.id}
-                          className="px-3 py-1 bg-[#0a0a0a] hover:bg-[#222] border border-[#333] text-white rounded text-sm transition-all disabled:opacity-50 cursor-pointer"
-                        >
-                          {tag.is_active ? "Deactivate" : "Activate"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {tags.map((tag) => {
+                    const isEditing = editingTag === tag.id;
+                    const displayScore = isEditing
+                      ? editValues?.score ?? tag.score.toString()
+                      : tag.score.toString();
+                    const displayColor = isEditing
+                      ? editValues?.color ?? tag.color
+                      : tag.color;
+
+                    return (
+                      <tr key={tag.id} className="hover:bg-[#0a0a0a]/50">
+                        <td className="px-6 py-4">
+                          <span
+                            className="px-3 py-1 rounded-full text-sm font-medium border"
+                            style={{
+                              backgroundColor: `${displayColor}20`,
+                              borderColor: displayColor,
+                              color: displayColor,
+                            }}
+                          >
+                            {tag.name}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="number"
+                            value={displayScore}
+                            onChange={(e) => {
+                              if (!isEditing) {
+                                startEditing(tag);
+                              }
+                              setEditValues({
+                                score: e.target.value,
+                                color: displayColor,
+                              });
+                            }}
+                            disabled={isSaving}
+                            min="0"
+                            max="100"
+                            className="w-20 bg-[#0a0a0a] border border-[#333] rounded px-2 py-1 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50"
+                          />
+                        </td>
+                        <td className="px-6 py-4">
+                          <input
+                            type="color"
+                            value={displayColor}
+                            onChange={(e) => {
+                              if (!isEditing) {
+                                startEditing(tag);
+                              }
+                              setEditValues({
+                                score: displayScore,
+                                color: e.target.value,
+                              });
+                            }}
+                            disabled={isSaving}
+                            className="w-12 h-8 bg-[#0a0a0a] border border-[#333] rounded cursor-pointer disabled:opacity-50"
+                          />
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-400">
+                          {tag._count.items} items
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                              tag.is_active
+                                ? "bg-green-500/10 text-green-400 border-green-500/20"
+                                : "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                            }`}
+                          >
+                            {tag.is_active ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {isEditing ? (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => saveEditing(tag.id)}
+                                disabled={isSaving}
+                                className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-all disabled:opacity-50 cursor-pointer"
+                              >
+                                {isSaving ? "Saving..." : "Save"}
+                              </button>
+                              <button
+                                onClick={cancelEditing}
+                                disabled={isSaving}
+                                className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition-all disabled:opacity-50 cursor-pointer"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleToggleActive(tag)}
+                              disabled={isSaving}
+                              className="px-3 py-1 bg-[#0a0a0a] hover:bg-[#222] border border-[#333] text-white rounded text-sm transition-all disabled:opacity-50 cursor-pointer"
+                            >
+                              {tag.is_active ? "Deactivate" : "Activate"}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

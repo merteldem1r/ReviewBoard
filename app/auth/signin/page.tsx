@@ -99,16 +99,18 @@ export default function SignInPage() {
 
         <div className="bg-[#1a1a1a] rounded-lg shadow-xl p-8 border border-[#333]">
           {/* Password Sign In Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
             <div>
               <label className="block text-sm font-medium mb-2">Email</label>
               <input
                 type="email"
+                name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
                 disabled={isLoading}
+                autoComplete="email"
                 className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50"
               />
             </div>
@@ -117,11 +119,13 @@ export default function SignInPage() {
               <label className="block text-sm font-medium mb-2">Password</label>
               <input
                 type="password"
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
                 disabled={isLoading}
+                autoComplete="current-password"
                 className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50"
               />
             </div>
