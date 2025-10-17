@@ -107,7 +107,7 @@ export default function AdminTagsPage() {
           <div className="flex gap-4">
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all cursor-pointer"
             >
               {showCreateForm ? "Cancel" : "+ Create Tag"}
             </button>
@@ -140,7 +140,7 @@ export default function AdminTagsPage() {
                   }
                   required
                   className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-                  placeholder="e.g., High Value"
+                  placeholder="e.g., Hardware"
                 />
               </div>
               <div>
@@ -151,7 +151,10 @@ export default function AdminTagsPage() {
                   type="number"
                   value={formData.score}
                   onChange={(e) =>
-                    setFormData({ ...formData, score: parseInt(e.target.value) })
+                    setFormData({
+                      ...formData,
+                      score: parseInt(e.target.value),
+                    })
                   }
                   required
                   min="0"
@@ -173,7 +176,7 @@ export default function AdminTagsPage() {
               <div className="flex items-end">
                 <button
                   type="submit"
-                  className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all"
+                  className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all cursor-pointer"
                 >
                   Create Tag
                 </button>
@@ -254,7 +257,7 @@ export default function AdminTagsPage() {
                             handleUpdate(tag.id, { color: e.target.value })
                           }
                           disabled={editingTag === tag.id}
-                          className="w-12 h-8 bg-[#0a0a0a] border border-[#333] rounded cursor-pointer"
+                          className="w-12 h-8 bg-[#0a0a0a] border border-[#333] rounded cursor-pointer!"
                         />
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-400">
@@ -275,7 +278,7 @@ export default function AdminTagsPage() {
                         <button
                           onClick={() => handleToggleActive(tag)}
                           disabled={editingTag === tag.id}
-                          className="px-3 py-1 bg-[#0a0a0a] hover:bg-[#222] border border-[#333] text-white rounded text-sm transition-all disabled:opacity-50"
+                          className="px-3 py-1 bg-[#0a0a0a] hover:bg-[#222] border border-[#333] text-white rounded text-sm transition-all disabled:opacity-50 cursor-pointer"
                         >
                           {tag.is_active ? "Deactivate" : "Activate"}
                         </button>
@@ -292,7 +295,9 @@ export default function AdminTagsPage() {
         {!isLoading && tags.length === 0 && (
           <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-12 text-center">
             <h2 className="text-xl font-bold mb-2">No tags found</h2>
-            <p className="text-gray-400">Create your first tag to get started</p>
+            <p className="text-gray-400">
+              Create your first tag to get started
+            </p>
           </div>
         )}
       </div>

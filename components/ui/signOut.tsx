@@ -25,7 +25,7 @@ const SignOut = () => {
         className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border text-[#ee5757] border-[#ee5757] rounded-lg transition-all cursor-pointer"
         onClick={handleSignOut}
       >
-        {isLoading ? "Signing out..." : "Sign Out"}
+        {isLoading ? "⏻ Signing out..." : "⏻ Sign Out"}
       </button>
     </div>
   );

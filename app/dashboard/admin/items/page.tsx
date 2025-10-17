@@ -393,7 +393,7 @@ export default function AdminItemsPage() {
                           handleStatusChange(item.id, e.target.value)
                         }
                         disabled={changingStatus === item.id || !item.is_active}
-                        className="bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
                         <option value="NEW" disabled={item.status === "NEW"}>
                           {item.status === "NEW" ? "✓ " : ""}New
@@ -423,7 +423,7 @@ export default function AdminItemsPage() {
                     <button
                       onClick={() => handleToggleActive(item)}
                       disabled={changingStatus === item.id}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50 ${
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-50 cursor-pointer ${
                         item.is_active
                           ? "bg-red-600 hover:bg-red-700 text-white"
                           : "bg-green-600 hover:bg-green-700 text-white"

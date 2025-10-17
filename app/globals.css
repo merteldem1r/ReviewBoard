@@ -19,8 +19,19 @@ body {
   min-height: 100vh;
 }
 
+select {
+  cursor: pointer;
+}
+
+
+button {
+  cursor: pointer;
+}
+
 /* Modern dark theme styles */
-input, textarea, select {
+input,
+textarea,
+select {
   background: #1a1a1a;
   border: 1px solid #333;
   color: #ededed;
@@ -29,7 +40,9 @@ input, textarea, select {
   transition: all 0.2s;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);

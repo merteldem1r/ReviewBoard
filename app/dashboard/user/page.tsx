@@ -1,4 +1,5 @@
 import ItemStats from "@/components/items/ItemStats";
+import RiskScoreInfo from "@/components/items/RiskScoreInfo";
 import { StatsLoadingSkeleton } from "@/components/skeletons/ItemLoadingSkeleton";
 import { SignOut } from "@/components/ui/signOut";
 import { authOptions } from "@/lib/auth";
@@ -46,7 +47,7 @@ export default async function DashboardPage() {
             >
               <div className="text-2xl mb-2">📋</div>
               <h3 className="font-bold mb-1 group-hover:text-blue-500">
-                View All Items
+                My Items
               </h3>
               <p className="text-sm text-gray-400">
                 Browse and filter submitted items
@@ -65,6 +66,11 @@ export default async function DashboardPage() {
               </p>
             </Link>
           </div>
+        </div>
+
+        {/* Risk Score Information */}
+        <div className="mt-6">
+          <RiskScoreInfo />
         </div>
       </div>
     </main>

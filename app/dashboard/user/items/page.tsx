@@ -87,7 +87,7 @@ export default function ItemsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Items</h1>
+            <h1 className="text-3xl font-bold mb-2">My Items</h1>
             <p className="text-gray-400">Manage and review submitted deals</p>
           </div>
           <div className="flex gap-4">
@@ -95,7 +95,7 @@ export default function ItemsPage() {
               href="/dashboard"
               className="px-4 py-2 bg-[#1a1a1a] hover:bg-[#222] border border-[#333] text-white rounded-lg transition-all text-center"
             >
-              Dashboard
+              ← Dashboard
             </Link>
             <Link
               href="/dashboard/user/items/new"
@@ -115,7 +115,7 @@ export default function ItemsPage() {
                 value={statusFilter}
                 disabled={isLoading}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
               >
                 <option value="">All</option>
                 <option value="NEW">New</option>
@@ -126,13 +126,13 @@ export default function ItemsPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">
-                Risk Score
+                Risk Scor
               </label>
               <select
                 value={riskFilter}
                 onChange={(e) => setRiskFilter(e.target.value)}
                 disabled={isLoading}
-                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
               >
                 <option value="">All</option>
                 <option value="low">Low (0-30)</option>
@@ -146,7 +146,7 @@ export default function ItemsPage() {
                 value={tagFilter}
                 onChange={(e) => setTagFilter(e.target.value)}
                 disabled={isLoading}
-                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                className="w-full bg-[#0a0a0a] border border-[#333] rounded-lg px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
               >
                 <option value="">All</option>
                 {tags ? (
