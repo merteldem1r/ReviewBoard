@@ -22,10 +22,9 @@ export const POST = async (req: NextRequest) => {
 
     console.log("Cron job started: Auto-updating item statuses");
 
-    // Calculate timestamp for 1 hour ago
-    // Items created before this time (1+ hours old) will be updated
+    // items that created less
     const minutesAgo30 = new Date();
-    minutesAgo30.setHours(minutesAgo30.getMinutes() - 30);
+    minutesAgo30.setMinutes(minutesAgo30.getMinutes() - 30);
 
     // Find items to update
     const itemsToUpdate = await prisma.item.findMany({
