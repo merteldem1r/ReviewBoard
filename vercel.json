@@ -1,8 +1,1 @@
-{
-  "crons": [
-    {
-      "path": "/api/crons/item-status-scheduler",
-      "schedule": "0 1 * * *"
-    }
-  ]
-}
+{}
