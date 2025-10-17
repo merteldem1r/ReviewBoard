@@ -1,6 +1,12 @@
 import { authOptions } from "@/lib/auth";
 import { calculateRiskScore } from "@/lib/items/risk-calculator";
 import { prisma } from "@/lib/prisma";
+import {
+  redis,
+  getCacheKey,
+  invalidateCache,
+  CACHE_TTL,
+} from "@/lib/redis/redis";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -126,6 +132,10 @@ export async function POST(req: Request) {
       },
     });
 
+    // Invalidate user's items cache on item creating
+    const cacheKey = getCacheKey("user:items", session.user.id);
+    await invalidateCache(cacheKey);
+
     return NextResponse.json(
       {
         item,
@@ -154,6 +164,29 @@ export async function GET(req: Request) {
     const tagName = searchParams.get("tag");
     const minRisk = searchParams.get("minRisk");
     const maxRisk = searchParams.get("maxRisk");
+
+    // Redis caching
+    const filterKey = `${status || "all"}-${tagName || "all"}-${
+      minRisk || "all"
+    }-${maxRisk || "all"}`;
+    const cacheKey = getCacheKey(`user:items:${filterKey}`, session.user.id);
+
+    const cachedItems = await redis.get(cacheKey);
+
+    if (cachedItems) {
+      console.log("Cache HIT for user:", session.user.id);
+      return NextResponse.json(
+        { items: cachedItems, cached: true },
+        {
+          status: 200,
+          headers: {
+            "X-Cache-Status": "HIT",
+          },
+        }
+      );
+    }
+
+    console.log("Cache MISS for user:", session.user.id);
 
     // filter
     const where: any = {
@@ -202,7 +235,18 @@ export async function GET(req: Request) {
       },
     });
 
-    return NextResponse.json({ items });
+    // Cache the results with TTL (5 minutes)
+    await redis.set(cacheKey, items, { ex: CACHE_TTL.ITEMS });
+
+    return NextResponse.json(
+      { items, cached: false },
+      {
+        status: 200,
+        headers: {
+          "X-Cache-Status": "MISS",
+        },
+      }
+    );
   } catch (error) {
     console.error("Fetch items error:", error);
     return NextResponse.json(

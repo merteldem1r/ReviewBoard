@@ -70,14 +70,6 @@ ReviewBoard is an enterprise-grade review management platform designed to stream
 
 <img width="1701" height="867" alt="image" src="https://github.com/user-attachments/assets/897d7209-82de-4cd3-b468-528796030598" />
 
-### Audit & Compliance
-
-- **Complete Audit Trail**: Every action logged with timestamp and user
-- **Action Types**: CREATED, STATUS_CHANGED, STATUS_CHANGED_BY_SYSTEM, UPDATED
-- **Pagination**: Efficient browsing of large audit log datasets
-- **Filtering**: Filter by action type, user, item, and date range
-- **System vs Manual**: Clear distinction between automated and manual changes
-
 ## Setup & Installation
 
 ### Prerequisites
