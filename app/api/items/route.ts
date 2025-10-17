@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { calculateRiskScore } from "@/lib/items/risk-calculator";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -155,29 +155,31 @@ export async function GET(req: Request) {
     const minRisk = searchParams.get("minRisk");
     const maxRisk = searchParams.get("maxRisk");
 
-    // Build filter
-    const where: any = {};
+    // filter
+    const where: any = {
+      user_id: session.user.id,
+    };
 
     if (status) {
       where.status = status;
     }
 
-    // Filter by tag name using relation
+    // tag name
     if (tagName) {
       where.tags = {
         some: {
-          name: tagName, // ✅ Filter items that have this tag
+          name: tagName,
         },
       };
     }
 
+    // risk filter
     if (minRisk || maxRisk) {
       where.risk_score = {};
       if (minRisk) where.risk_score.gte = parseInt(minRisk);
       if (maxRisk) where.risk_score.lte = parseInt(maxRisk);
     }
 
-    // Fetch items with populated tags
     const items = await prisma.item.findMany({
       where,
       include: {
