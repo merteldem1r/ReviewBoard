@@ -1,10 +1,4 @@
-# ReviewBoard
-
-A comprehensive review management system with automated workflows, risk scoring, and role-based access control.
-
-<img width="1700" height="825" alt="image" src="https://github.com/user-attachments/assets/c613a098-39cb-4918-ab97-901505543334" />
-
-## Technology Stack
+# ReviewBoard - Test Case
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.5.5-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
@@ -13,6 +7,14 @@ A comprehensive review management system with automated workflows, risk scoring,
 ![Prisma](https://img.shields.io/badge/Prisma-6.17.1-2D3748?style=flat-square&logo=prisma)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=flat-square&logo=postgresql)
 ![NextAuth.js](https://img.shields.io/badge/NextAuth.js-JWT-black?style=flat-square)
+
+A comprehensive review management system with automated workflows, risk scoring, and role-based access control.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+<img width="1700" height="825" alt="image" src="https://github.com/user-attachments/assets/c613a098-39cb-4918-ab97-901505543334" />
+
+## Technology Stack
 
 **Frontend:** Next.js 15.5.5, React 19, TypeScript, Tailwind CSS  
 **Backend:** Next.js API Routes (REST), NextAuth.js (JWT Authentication)  
@@ -35,7 +37,6 @@ ReviewBoard is an enterprise-grade review management platform designed to stream
 #### Items
 
 <img width="1698" height="479" alt="image" src="https://github.com/user-attachments/assets/e3f7996f-f794-41fe-9449-dc716cf3f54b" />
-
 
 ### Reviewer Perspective
 
@@ -69,53 +70,6 @@ ReviewBoard is an enterprise-grade review management platform designed to stream
 
 <img width="1701" height="867" alt="image" src="https://github.com/user-attachments/assets/897d7209-82de-4cd3-b468-528796030598" />
 
-
-## Key Features
-
-### Authentication & Authorization
-
-- **Secure Authentication**: Email/password and OAuth (GitHub) support via NextAuth.js
-- **JWT Sessions**: Stateless authentication with JWT tokens
-- **Email Verification**: Account verification system for new users
-- **Role-Based Access Control**: Three distinct user roles (User, Reviewer, Admin)
-
-### Item Management
-
-- **Create & Submit**: Users can create items with title, description, amount, and tags
-- **Automated Risk Scoring**: Real-time risk calculation based on configurable rules
-- **Tag System**: Categorize items with color-coded tags
-- **Status Tracking**: Four-stage workflow (NEW → IN_REVIEW → APPROVED/REJECTED)
-- **Item Filtering**: Filter by status, tags, risk level, and search by title
-
-### Automated Workflows
-
-- **Status Auto-Progression**: Items automatically move from NEW to IN_REVIEW after 30 minutes
-- **Scheduled Execution**: Cron job runs every 10 minutes via external service
-- **System Audit Logging**: All automated changes are logged with special designation
-- **Bearer Token Authentication**: Secure cron endpoint with CRON_SECRET
-
-### Risk Scoring System
-
-- **Amount-Based Rules**: Calculate risk scores based on transaction amounts
-- **Tag-Based Rules**: Assign risk scores to specific tags
-- **Dynamic Calculation**: Risk scores automatically calculated on item creation/update
-- **Visual Indicators**: Color-coded risk levels (Low: 0-30, Medium: 31-70, High: 71-100)
-
-### Review System
-
-- **Reviewer Dashboard**: Dedicated interface for reviewing pending items
-- **Bulk Actions**: Approve or reject items with comments
-- **Audit Trail**: All status changes tracked with user information
-- **Statistics**: Real-time metrics for items by status and user activity
-
-### Administrative Controls
-
-- **User Management**: Create, update, delete users and assign roles
-- **Rule Configuration**: Define and manage amount and tag-based scoring rules
-- **Tag Management**: Create, update, and organize tags with colors
-- **Audit Log Viewer**: Comprehensive audit trail with filtering and pagination
-- **System Information**: Detailed documentation of tech stack and workflows
-
 ### Audit & Compliance
 
 - **Complete Audit Trail**: Every action logged with timestamp and user
@@ -123,77 +77,6 @@ ReviewBoard is an enterprise-grade review management platform designed to stream
 - **Pagination**: Efficient browsing of large audit log datasets
 - **Filtering**: Filter by action type, user, item, and date range
 - **System vs Manual**: Clear distinction between automated and manual changes
-
-## User Roles & Permissions
-
-### User (Standard)
-
-Users represent the primary actors who submit items for review.
-
-**Permissions:**
-
-- Create new items with tags and amounts
-- View and edit their own items
-- Track item status through the workflow
-- View personal statistics and metrics
-
-**Access Restrictions:**
-
-- Cannot view other users' items
-- Cannot approve or reject items
-- Cannot access admin or reviewer dashboards
-
-### Reviewer
-
-Reviewers are responsible for evaluating submitted items and making approval decisions.
-
-**Permissions:**
-
-- View all submitted items across the system
-- Approve or reject items with comments
-- Access reviewer dashboard with statistics
-- Filter and search through all items
-- View detailed item information and risk scores
-
-**Access Restrictions:**
-
-- Cannot manage system configuration
-- Cannot create or modify rules
-- Cannot manage users or tags
-
-### Administrator
-
-Administrators have full system access and management capabilities.
-
-**Permissions:**
-
-- All reviewer permissions
-- User management (create, update, delete, role assignment)
-- Rule configuration (amount rules, tag rules)
-- Tag management (create, update, delete, color customization)
-- Audit log access (view all system activity)
-- System information access
-- Access to all administrative dashboards
-
-## Database Schema
-
-### Core Models
-
-- **User**: Authentication and profile information with role assignment
-- **Item**: Submitted items with status tracking and risk scores
-- **Tag**: Categorization system with color coding
-- **Rule**: Risk scoring configuration (amount-based and tag-based)
-- **AuditLog**: Complete activity history with action types
-- **Account**: OAuth provider connections
-- **Session**: NextAuth.js session management
-- **VerificationToken**: Email verification tokens
-
-### Key Relationships
-
-- Users can have multiple Items (one-to-many)
-- Items can have multiple Tags (many-to-many)
-- Items have multiple AuditLogs (one-to-many)
-- AuditLogs reference both User and Item (many-to-one)
 
 ## Setup & Installation
 
@@ -272,32 +155,3 @@ CRON_SECRET=your-cron-secret-key
 2. Create new cron job with endpoint: `https://your-domain.com/api/crons/item-status-scheduler`
 3. Set schedule to `*/10 * * * *` (every 10 minutes)
 4. Add header: `Authorization: Bearer CRON_SECRET`
-
-## Security Features
-
-- **Authentication**: Secure JWT-based sessions with NextAuth.js
-- **Password Hashing**: Bcrypt encryption for stored passwords
-- **Email Verification**: Prevents unauthorized account creation
-- **Role-Based Access**: Strict permission enforcement on API routes
-- **Cron Security**: Bearer token authentication for automated endpoints
-- **SQL Injection Protection**: Prisma ORM parameterized queries
-- **CSRF Protection**: Built-in NextAuth.js CSRF tokens
-
-## Performance Optimizations
-
-- **Server-Side Rendering**: Fast initial page loads with Next.js SSR
-- **Pagination**: Efficient data loading for large datasets
-- **Database Indexing**: Optimized queries on frequently accessed columns
-- **Connection Pooling**: PgBouncer for efficient database connections
-- **API Caching**: Strategic use of caching for static data
-
-## Audit & Compliance
-
-The system maintains a complete audit trail of all actions:
-
-- **User Actions**: Every create, update, and delete operation
-- **Status Changes**: Manual and automated status transitions
-- **System Events**: Automated processes and cron job executions
-- **User Attribution**: All actions linked to responsible user or system
-- **Timestamps**: Precise timing for all events
-- **Filtering**: Advanced search and filter capabilities
