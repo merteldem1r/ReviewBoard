@@ -58,7 +58,10 @@ export default function AdminItemsPage() {
         if (statusFilter) params.append("status", statusFilter);
         if (tagFilter) params.append("tag", tagFilter);
         if (activeFilter !== "all") {
-          params.append("is_active", activeFilter === "active" ? "true" : "false");
+          params.append(
+            "is_active",
+            activeFilter === "active" ? "true" : "false"
+          );
         }
 
         if (riskFilter === "low") {
@@ -72,9 +75,7 @@ export default function AdminItemsPage() {
           params.append("maxRisk", "100");
         }
 
-        const response = await fetch(
-          `/api/admin/items?${params.toString()}`
-        );
+        const response = await fetch(`/api/admin/items?${params.toString()}`);
         const data = await response.json();
         setItems(data.items);
       } catch (error) {
@@ -89,10 +90,10 @@ export default function AdminItemsPage() {
   const handleStatusChange = async (itemId: string, newStatus: string) => {
     setChangingStatus(itemId);
     try {
-      const response = await fetch(`/api/admin/items/${itemId}/status`, {
+      const response = await fetch(`/api/admin/items/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ itemId, status: newStatus }),
       });
 
       if (!response.ok) {
