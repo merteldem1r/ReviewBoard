@@ -20,6 +20,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Backend:** Next.js API Routes (REST), NextAuth.js (JWT Authentication)  
 **Database:** PostgreSQL with Prisma ORM  
 **Infrastructure:** Vercel (Deployment), Supabase (Database Hosting)  
+**Caching:** Redis (Upstash)
 **Automation:** Cron-job.org (Scheduled Tasks)
 
 ## Overview

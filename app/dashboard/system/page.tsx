@@ -90,6 +90,10 @@ export default async function SystemPage() {
                     <span className="text-xs text-blue-400">Database</span>
                   </div>
                   <div className="flex items-center justify-between">
+                    <span className="text-sm">Redis (Upstash)</span>
+                    <span className="text-xs text-red-400">Cache</span>
+                  </div>
+                  <div className="flex items-center justify-between">
                     <span className="text-sm">Supabase</span>
                     <span className="text-xs text-green-400">Hosting</span>
                   </div>
@@ -201,6 +205,96 @@ export default async function SystemPage() {
                     <span>View audit logs</span>
                   </li>
                 </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Redis Caching */}
+        <section className="mb-8">
+          <div className="bg-[#1a1a1a] rounded-lg border border-[#333] p-6">
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              Redis Caching Layer
+            </h2>
+
+            <div className="bg-[#0a0a0a] rounded-lg p-5 border border-[#333] mb-4">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold text-lg mb-1">
+                    Performance Optimization
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    In-memory caching for frequently accessed data
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
+                  ACTIVE
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Provider</div>
+                    <div className="text-sm font-medium">
+                      <a
+                        href="https://console.upstash.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 underline"
+                      >
+                        Upstash Redis
+                      </a>
+                      <span className="text-gray-500 ml-1 text-xs">
+                        (Serverless)
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Cache TTL</div>
+                    <div className="text-sm font-medium">
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-400">Items:</span>
+                        <span>5 minutes</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-purple-400">Tags:</span>
+                        <span>10 minutes</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Cached Endpoints
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-sm font-mono bg-[#1a1a1a] px-2 py-1 rounded border border-[#333]">
+                        GET /api/items
+                      </div>
+                      <div className="text-sm font-mono bg-[#1a1a1a] px-2 py-1 rounded border border-[#333]">
+                        GET /api/tags
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Invalidation Triggers
+                    </div>
+                    <div className="text-sm space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-400">✓</span>
+                        <span>Item creation/update/delete</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-400">✓</span>
+                        <span>Tag creation/update/delete</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
