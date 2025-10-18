@@ -96,6 +96,10 @@ DIRECT_URL="postgresql://user:password@host:port/database"
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
 
+# Redis (Upstash)
+UPSTASH_REDIS_REST_URL=your-upstash-redis-rest-url
+UPSTASH_REDIS_REST_TOKEN=your-upstash-redis-rest-token
+
 # OAuth (Optional)
 GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET="your-github-client-secret"
@@ -151,3 +155,17 @@ CRON_SECRET=your-cron-secret-key
 2. Create new cron job with endpoint: `https://your-domain.com/api/crons/item-status-scheduler`
 3. Set schedule to `*/10 * * * *` (every 10 minutes)
 4. Add header: `Authorization: Bearer CRON_SECRET`
+
+### Redis Cache Configuration (Upstash)
+
+1. Create account at [Upstash Console](https://console.upstash.com/)
+2. Create a new Redis database 
+3. Copy the **REST API** credentials:
+   - `UPSTASH_REDIS_REST_URL`
+   - `UPSTASH_REDIS_REST_TOKEN`
+4. Add these credentials to your `.env` file and Vercel environment variables
+5. Redis is used for caching:
+   - User items (5-minute TTL)
+   - Tags (10-minute TTL)
+   - Automatically invalidated on data mutations
+
