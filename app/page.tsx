@@ -16,7 +16,15 @@ export default async function HomePage() {
           ReviewBoard
         </h1>
         <p className="text-xl text-gray-300 mb-4">
-          Mini Deal/Issue Review System
+          Mini Deal/Issue Review System by{" "}
+          <a
+            className="text-[#7954FF] underline"
+            target="_blank"
+            href="https://github.com/merteldem1r"
+          >
+            Mert Eldemir
+          </a>
+          <div className="w-full fex justifyl-ceter mt-8"></div>
         </p>
         <p className="text-gray-400 mb-6">
           {session?.user
