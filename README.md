@@ -16,11 +16,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Technology Stack
 
-**Frontend:** Next.js 15.5.5, React 19, TypeScript, Tailwind CSS  
+**Frontend:** Next.js 15.5.5, React 19, TypeScript, Tailwind CSS 
+<br/>
 **Backend:** Next.js API Routes (REST), NextAuth.js (JWT Authentication)  
+<br/>
 **Database:** PostgreSQL with Prisma ORM  
+<br/>
 **Infrastructure:** Vercel (Deployment), Supabase (Database Hosting)  
+<br/>
 **Caching:** Redis (Upstash)
+<br/>
 **Automation:** Cron-job.org (Scheduled Tasks)
 
 ## Overview
