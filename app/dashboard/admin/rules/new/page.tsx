@@ -42,7 +42,7 @@ export default function NewRulePage() {
 
   const fetchTags = async () => {
     try {
-      const response = await fetch("/api/admin/tags");
+      const response = await fetch("/api/tags");
       const data = await response.json();
       setTags(data.tags.filter((tag: Tag) => tag.is_active));
     } catch (error) {

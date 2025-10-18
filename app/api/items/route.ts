@@ -3,7 +3,7 @@ import { calculateRiskScore } from "@/lib/items/risk-calculator";
 import { prisma } from "@/lib/prisma";
 import {
   redis,
-  getCacheKey,
+  getCacheKeyUser,
   invalidateCache,
   CACHE_TTL,
 } from "@/lib/redis/redis";
@@ -133,7 +133,7 @@ export async function POST(req: Request) {
     });
 
     // Invalidate user's items cache on item creating
-    const cacheKey = getCacheKey("user:items", session.user.id);
+    const cacheKey = getCacheKeyUser("user:items", session.user.id);
     await invalidateCache(cacheKey);
 
     return NextResponse.json(
@@ -165,29 +165,35 @@ export async function GET(req: Request) {
     const minRisk = searchParams.get("minRisk");
     const maxRisk = searchParams.get("maxRisk");
 
-    // Redis caching
-    const filterKey = `${status || "all"}-${tagName || "all"}-${
-      minRisk || "all"
-    }-${maxRisk || "all"}`;
-    const cacheKey = getCacheKey(`user:items:${filterKey}`, session.user.id);
+    // Check if any filters are applied
+    const hasFilters = status || tagName || minRisk || maxRisk;
 
-    const cachedItems = await redis.get(cacheKey);
+    // Only use Redis caching for unfiltered requests (all items)
+    let cachedItems = null;
+    const cacheKey = getCacheKeyUser("user:items", session.user.id);
 
-    if (cachedItems) {
-      console.log("Cache HIT for user:", session.user.id);
-      return NextResponse.json(
-        { items: cachedItems, cached: true },
-        {
-          status: 200,
-          headers: {
-            "X-Cache-Status": "HIT",
-          },
-        }
-      );
+    if (!hasFilters) {
+      cachedItems = await redis.get(cacheKey);
+
+      if (cachedItems) {
+        console.log("Cache HIT for user:", session.user.id);
+        return NextResponse.json(
+          { items: cachedItems, cached: true },
+          {
+            status: 200,
+            headers: {
+              "X-Cache-Status": "HIT",
+            },
+          }
+        );
+      }
+
+      console.log("Cache MISS for user:", session.user.id);
+    } else {
+      console.log("Filtered query - skipping cache for user:", session.user.id);
     }
 
-    console.log("Cache MISS for user:", session.user.id);
-
+    // db query
     // filter
     const where: any = {
       user_id: session.user.id,
@@ -235,15 +241,17 @@ export async function GET(req: Request) {
       },
     });
 
-    // Cache the results with TTL (5 minutes)
-    await redis.set(cacheKey, items, { ex: CACHE_TTL.ITEMS });
+    // Cache the results only if no filters were applied
+    if (!hasFilters) {
+      await redis.set(cacheKey, items, { ex: CACHE_TTL.ITEMS });
+    }
 
     return NextResponse.json(
       { items, cached: false },
       {
         status: 200,
         headers: {
-          "X-Cache-Status": "MISS",
+          "X-Cache-Status": hasFilters ? "SKIP" : "MISS",
         },
       }
     );

@@ -8,13 +8,16 @@ export const redis = new Redis({
 // Cache config
 export const CACHE_TTL = {
   ITEMS: 300,
+  TAGS: 600
 };
 
 // helpers
-export function getCacheKey(prefix: string, userId: string): string {
-  return `${prefix}:${userId}`;
-}
-
 export async function invalidateCache(key: string): Promise<void> {
   await redis.del(key);
 }
+
+export function getCacheKeyUser(prefix: string, userId: string): string {
+  return `${prefix}:${userId}`;
+}
+
+

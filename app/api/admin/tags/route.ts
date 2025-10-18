@@ -1,43 +1,8 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis/redis";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check if user is ADMIN
-    if (session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const tags = await prisma.tag.findMany({
-      include: {
-        _count: {
-          select: {
-            items: true,
-          },
-        },
-      },
-      orderBy: {
-        name: "asc",
-      },
-    });
-
-    return NextResponse.json({ tags });
-  } catch (error) {
-    console.error("Failed to fetch tags:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch tags" },
-      { status: 500 }
-    );
-  }
-}
 
 export async function POST(req: Request) {
   try {
@@ -89,6 +54,10 @@ export async function POST(req: Request) {
         is_active: is_active ?? true,
       },
     });
+
+    // Invalidate both admin and user tag caches
+    await redis.del("tags:admin:all");
+    await redis.del("tags:user:active");
 
     return NextResponse.json({ tag }, { status: 201 });
   } catch (error) {

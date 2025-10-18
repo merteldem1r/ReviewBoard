@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis/redis";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -43,6 +44,10 @@ export async function PATCH(
       where: { id: tagId },
       data: updateData,
     });
+
+    // Invalidate both admin and user tag caches
+    await redis.del("tags:admin:all");
+    await redis.del("tags:user:active");
 
     return NextResponse.json({ tag });
   } catch (error) {
@@ -94,6 +99,10 @@ export async function DELETE(
     await prisma.tag.delete({
       where: { id: tagId },
     });
+
+    // Invalidate both admin and user tag caches
+    await redis.del("tags:admin:all");
+    await redis.del("tags:user:active");
 
     return NextResponse.json({ success: true });
   } catch (error) {
