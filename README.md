@@ -52,6 +52,10 @@ ReviewBoard is an enterprise-grade review management platform designed to stream
 
 <img width="1696" height="548" alt="image" src="https://github.com/user-attachments/assets/8ec5d570-9191-4460-9882-7d50cdfba748" />
 
+#### Users
+
+<img width="1698" height="444" alt="rb-rev-users" src="https://github.com/user-attachments/assets/5c15a72a-fdd0-4460-b205-d475300e36b8" />
+
 ### Admin Perspective
 
 #### Dashboard
