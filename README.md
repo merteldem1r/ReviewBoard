@@ -6,11 +6,11 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.1-38bdf8?style=flat-square&logo=tailwind-css)
 ![Prisma](https://img.shields.io/badge/Prisma-6.17.1-2D3748?style=flat-square&logo=prisma)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=flat-square&logo=postgresql)
-![NextAuth.js](https://img.shields.io/badge/NextAuth.js-JWT-black?style=flat-square)
 
-A comprehensive review management system with automated workflows, risk scoring, and role-based access control.
+A comprehensive **review management system** with automated **workflows**, **risk scoring**, and **role-based access control**.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Author**: [Mert Eldemir](https://github.com/merteldem1r/ReviewBoard)<br/>
+This project is **licensed under the MIT License** - see the [LICENSE](LICENSE) file for details.
 
 <img width="1700" height="825" alt="image" src="https://github.com/user-attachments/assets/c613a098-39cb-4918-ab97-901505543334" />
 
