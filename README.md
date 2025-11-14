@@ -7,7 +7,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-6.17.1-2D3748?style=flat-square&logo=prisma)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=flat-square&logo=postgresql)
 
-A comprehensive **review management system** with automated **workflows**, **risk scoring**, and **role-based access control**.
+**ReviewBoard** is a **full-stack web application** built to streamline the **submission**, **review**, and **approval process for business items**. The platform features an intelligent risk scoring system that automatically evaluates submissions based on **configurable rules**, helping prioritize **high-risk items** for **faster review**.
 
 **Author**: [Mert Eldemir](https://github.com/merteldem1r/ReviewBoard)<br/>
 This project is **licensed under the MIT License** - see the [LICENSE](LICENSE) file for details.
